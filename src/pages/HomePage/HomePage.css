@@ -1,0 +1,16 @@
+.home__header {
+  padding-top: 48px;
+}
+
+.home__title {
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.home__subtitle {
+  margin-top: var(--space-sm);
+
+  color: var(--color-text-light);
+
+  font-size: 18px;
+}

@@ -1,0 +1,17 @@
+.header {
+  padding-top: 24px;
+}
+
+.header__title {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.header__subtitle {
+  margin-top: 8px;
+
+  font-size: 16px;
+
+  color: var(--color-text-light);
+}
