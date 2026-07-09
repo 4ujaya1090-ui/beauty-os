@@ -1,17 +1,25 @@
 .header {
-  padding-top: 24px;
+  padding-top: var(--space-lg);
 }
 
 .header__title {
-  font-size: 30px;
+  font-size: 32px;
+
   font-weight: 700;
+
+  line-height: 1.2;
+
+  letter-spacing: -0.4px;
+
   color: var(--color-text);
 }
 
 .header__subtitle {
-  margin-top: 8px;
+  margin-top: 6px;
 
-  font-size: 16px;
+  font-size: 17px;
+
+  line-height: 1.5;
 
   color: var(--color-text-light);
 }

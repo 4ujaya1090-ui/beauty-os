@@ -1,0 +1,49 @@
+.stats {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 16px;
+
+  margin-top: 20px;
+}.next-title {
+  font-size: 22px;
+
+  font-weight: 700;
+}
+
+.next-empty {
+  margin-top: var(--space-md);
+
+  color: var(--color-text-light);
+
+  font-size: 16px;
+}
+
+.next-button {
+  margin-top: var(--space-lg);
+
+  width: 100%;
+
+  height: 56px;
+
+  border: none;
+
+  border-radius: var(--radius-medium);
+
+  background: var(--color-primary);
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: .25s ease;
+}
+
+.next-button:hover {
+  background: var(--color-primary-hover);
+}

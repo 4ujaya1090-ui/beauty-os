@@ -1,17 +1,75 @@
-.glass-card {
-  margin-top: 24px;
+.stat-card {
+  position: relative;
 
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-  border-radius: 24px;
+  min-height: 92px;
 
-  background: rgba(255, 255, 255, 0.55);
+  padding: 18px;
 
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 22px;
 
-  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.34);
 
-  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.45);
 
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  overflow: hidden;
+
+  transition: all .25s ease;
+
+  box-shadow:
+      0 2px 8px rgba(0,0,0,.04),
+      0 12px 30px rgba(0,0,0,.06),
+      inset 0 1px rgba(255,255,255,.55);
+}
+
+.stat-card::before{
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.28),
+            transparent 45%
+        );
+
+    pointer-events:none;
+}
+
+.stat-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 6px 16px rgba(0,0,0,.06),
+        0 18px 36px rgba(0,0,0,.08),
+        inset 0 1px rgba(255,255,255,.7);
+}
+
+.stat-card__title{
+
+    color:var(--color-text-light);
+
+    font-size:13px;
+
+    margin-bottom:10px;
+}
+
+.stat-card__value{
+
+    color:var(--color-text);
+
+    font-size:22px;
+
+    font-weight:700;
 }

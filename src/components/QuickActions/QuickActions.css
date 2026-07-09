@@ -1,0 +1,53 @@
+.quick-actions {
+  display: flex;
+
+  gap: var(--space-md);
+
+  margin-top: var(--space-lg);
+}
+
+.quick-actions button {
+  flex: 1;
+
+  height: 60px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+
+  border-radius: var(--radius-medium);
+
+  background: rgba(255, 255, 255, 0.55);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow: var(--shadow-small);
+
+  color: var(--color-text);
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.2px;
+
+  cursor: pointer;
+
+  transition:
+    transform .25s ease,
+    background .25s ease,
+    box-shadow .25s ease;
+}
+
+.quick-actions button:hover {
+  transform: translateY(-2px);
+
+  background: rgba(255, 255, 255, 0.72);
+
+  box-shadow: var(--shadow-medium);
+}
+
+.quick-actions button:active {
+  transform: translateY(0);
+
+  background: rgba(255, 255, 255, 0.85);
+}
