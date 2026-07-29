@@ -1,0 +1,49 @@
+.appointment-page {
+  display: flex;
+  flex-direction: column;
+
+  gap: 24px;
+
+  margin-top: 24px;
+}
+
+.appointment-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-bottom: 16px;
+}
+
+.appointment-field__label {
+  font-size: 14px;
+
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.appointment-field__select {
+  width: 100%;
+
+  padding: 16px 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  outline: none;
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.42);
+  color: var(--color-text);
+
+  font-size: 16px;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  transition: 0.2s;
+}
+
+.appointment-field__select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(205, 183, 167, 0.18);
+}

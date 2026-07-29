@@ -1,0 +1,9 @@
+.calendar-grid{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.calendar-empty{
+    color:var(--color-text-light);
+}

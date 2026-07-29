@@ -1,0 +1,35 @@
+.login-page {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.login-title {
+  font-size: 28px;
+  text-align: center;
+}
+
+.login-subtitle {
+  color: var(--color-text-light);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.login-error {
+  color: #b64545;
+  font-size: 14px;
+  text-align: center;
+}

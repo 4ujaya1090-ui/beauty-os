@@ -1,29 +1,68 @@
+import LoginPage from "./modules/auth/pages/LoginPage/LoginPage";
+import { useAuth } from "./modules/auth/context/AuthContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import HomePage from "./pages/HomePage/HomePage";
-import AppointmentPage from "./pages/AppointmentPage/AppointmentPage";
-import ClientsPage from "./pages/ClientsPage/ClientsPage";
-import ClientProfilePage from "./pages/ClientProfilePage/ClientProfilePage";
-import NewClientPage from "./pages/NewClientPage/NewClientPage";
+import HomePage from "./modules/shared/pages/HomePage/HomePage";
+import AppointmentPage from "./modules/appointments/pages/AppointmentPage/AppointmentPage";
+import CalendarPage from "./modules/appointments/pages/CalendarPage/CalendarPage";
+import ProceduresPage from "./modules/procedures/pages/ProceduresPage/ProceduresPage";
+
+import ClientsPage from "./modules/clients/pages/ClientsPage/ClientsPage";
+import ClientProfilePage from "./modules/clients/pages/ClientProfilePage/ClientProfilePage";
+import NewClientPage from "./modules/clients/pages/NewClientPage/NewClientPage";
+import EditClientPage from "./modules/clients/pages/EditClientPage/EditClientPage";
 
 function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
   return (
     <BrowserRouter>
-
       <Routes>
-
         <Route path="/" element={<HomePage />} />
 
-        <Route path="/appointment" element={<AppointmentPage />} />
+        <Route
+          path="/appointment"
+          element={<AppointmentPage />}
+        />
 
-        <Route path="/clients" element={<ClientsPage />} />
+        <Route
+          path="/calendar"
+          element={<CalendarPage />}
+        />
 
-        <Route path="/client" element={<ClientProfilePage />} />
+        <Route
+          path="/procedures"
+          element={<ProceduresPage />}
+        />
 
-        <Route path="/new-client" element={<NewClientPage />} />
+        <Route
+          path="/clients"
+          element={<ClientsPage />}
+        />
 
+        <Route
+          path="/client"
+          element={<ClientProfilePage />}
+        />
+
+        <Route
+          path="/new-client"
+          element={<NewClientPage />}
+        />
+
+        <Route
+          path="/edit-client"
+          element={<EditClientPage />}
+        />
       </Routes>
-
     </BrowserRouter>
   );
 }

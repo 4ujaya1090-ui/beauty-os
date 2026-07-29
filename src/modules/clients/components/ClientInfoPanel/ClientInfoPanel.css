@@ -1,0 +1,191 @@
+.client-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    text-align:center;
+}
+
+.client-avatar{
+
+    width:110px;
+
+    height:110px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.35);
+
+    border:1px solid rgba(255,255,255,.45);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:20px;
+
+    font-size:15px;
+}
+
+.client-name{
+
+    font-size:28px;
+
+    margin-bottom:10px;
+}
+
+.client-vip{
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,.35);
+
+    margin-bottom:18px;
+
+    font-size:14px;
+}
+
+.client-phone{
+
+    color:var(--color-text-light);
+
+    margin-bottom:28px;
+}
+
+.client-stats{
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:16px;
+
+    margin-bottom:22px;
+}
+
+.client-stat{
+
+    padding:16px;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.25);
+
+    border:1px solid rgba(255,255,255,.35);
+}
+
+.client-stat span{
+
+    display:block;
+
+    font-size:13px;
+
+    color:var(--color-text-light);
+
+    margin-bottom:8px;
+}
+
+.client-stat strong{
+
+    font-size:22px;
+}
+
+.client-last,
+.client-next{
+
+    width:100%;
+
+    padding:18px;
+
+    margin-top:14px;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.25);
+
+    border:1px solid rgba(255,255,255,.35);
+
+    text-align:left;
+}
+
+.client-last span,
+.client-next span{
+
+    display:block;
+
+    color:var(--color-text-light);
+
+    margin-bottom:6px;
+
+    font-size:13px;
+}.client-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 20px;
+  background: rgba(255,255,255,.08);
+}
+
+.client-avatar__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}.bonus-editor{
+    width:100%;
+
+    display:flex;
+    gap:8px;
+
+    margin-bottom:14px;
+}
+
+.bonus-editor__input{
+    width:80px;
+    flex-shrink:0;
+
+    padding:10px 12px;
+
+    border:1px solid rgba(255,255,255,.45);
+    border-radius:14px;
+
+    background:rgba(255,255,255,.35);
+    color:var(--color-text);
+
+    font-size:14px;
+}
+
+.bonus-editor__button{
+    flex:1;
+
+    padding:10px 8px;
+
+    border:1px solid rgba(255,255,255,.45);
+    border-radius:14px;
+
+    font-size:13px;
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.bonus-editor__button--add{
+    background:rgba(163,201,168,.35);
+}
+
+.bonus-editor__button--remove{
+    background:rgba(224,163,163,.35);
+}
+
+.bonus-editor__button:hover{
+    filter:brightness(0.96);
+}
