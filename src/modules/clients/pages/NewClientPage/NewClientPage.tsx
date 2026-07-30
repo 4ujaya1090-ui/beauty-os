@@ -10,6 +10,7 @@ import { useClients } from "../../context/ClientContext";
 
 import "./NewClientPage.css";
 
+import BackButton from "../../../shared/components/BackButton/BackButton";
 function NewClientPage() {
   const navigate = useNavigate();
 
@@ -43,7 +44,7 @@ function NewClientPage() {
     
 
       <div className="new-client-page">
-
+<BackButton />
         <SectionCard title="Новый клиент">
 
           <ClientForm
