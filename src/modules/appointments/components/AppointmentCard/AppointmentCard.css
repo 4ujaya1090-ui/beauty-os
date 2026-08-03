@@ -49,3 +49,24 @@ gap:6px;
 opacity:.7;
 
 }
+.appointment-card__actions{
+    display:flex;
+    gap:8px;
+
+    margin-left:auto;
+    flex-shrink:0;
+}
+
+.appointment-card__icon{
+    width:28px;
+    height:28px;
+
+    border:1px solid rgba(255,255,255,.6);
+    border-radius:10px;
+
+    background:rgba(255,255,255,.5);
+    color:var(--color-text-light);
+
+    cursor:pointer;
+    font-size:13px;
+}

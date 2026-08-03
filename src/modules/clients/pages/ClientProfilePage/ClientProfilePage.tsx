@@ -30,7 +30,11 @@ function ClientProfilePage() {
     deleteClient,
   } = useClients();
 
-  const { appointments } = useAppointments();
+  const {
+    appointments,
+    deleteAppointment,
+    setSelectedAppointment,
+  } = useAppointments();
 
   if (!selectedClient) {
     return (
@@ -45,6 +49,25 @@ function ClientProfilePage() {
   const clientHistory = appointments
     .filter((appointment) => appointment.clientId === selectedClient.id)
     .sort((a, b) => `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`));
+
+  function handleEditAppointment(appointmentId: string) {
+    const appointment = clientHistory.find((a) => a.id === appointmentId);
+
+    if (!appointment) {
+      return;
+    }
+
+    setSelectedAppointment(appointment);
+    navigate("/appointment");
+  }
+
+  function handleDeleteAppointment(appointmentId: string) {
+    if (!window.confirm("Удалить эту запись?")) {
+      return;
+    }
+
+    deleteAppointment(appointmentId);
+  }
 
   function handleDelete() {
     if (!selectedClient) {
@@ -79,13 +102,31 @@ function ClientProfilePage() {
             <div className="client-history">
               {clientHistory.map((appointment) => (
                 <div className="client-history__item" key={appointment.id}>
-                  <span className="client-history__date">
-                    {formatDate(appointment.date)}
-                  </span>
+                  <div>
+                    <span className="client-history__date">
+                      {formatDate(appointment.date)} · {appointment.time}
+                    </span>
 
-                  <span className="client-history__procedure">
-                    {appointment.procedure} · {appointment.duration} мин
-                  </span>
+                    <span className="client-history__procedure">
+                      {appointment.procedure} · {appointment.duration} мин
+                    </span>
+                  </div>
+
+                  <div className="client-history__actions">
+                    <button
+                      className="client-history__icon"
+                      onClick={() => handleEditAppointment(appointment.id)}
+                    >
+                      ✎
+                    </button>
+
+                    <button
+                      className="client-history__icon"
+                      onClick={() => handleDeleteAppointment(appointment.id)}
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

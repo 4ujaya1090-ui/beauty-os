@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import SectionCard from "../../../shared/components/SectionCard/SectionCard";
 import AppointmentCard from "../AppointmentCard/AppointmentCard";
 
@@ -17,7 +19,10 @@ function formatDate(isoDate: string) {
 }
 
 function Calendar() {
-  const { appointments } = useAppointments();
+  const navigate = useNavigate();
+
+  const { appointments, deleteAppointment, setSelectedAppointment } =
+    useAppointments();
   const { clients } = useClients();
 
   const sorted = [...appointments].sort((a, b) =>
@@ -25,6 +30,25 @@ function Calendar() {
   );
 
   const dates = Array.from(new Set(sorted.map((a) => a.date)));
+
+  function handleEdit(appointmentId: string) {
+    const appointment = appointments.find((a) => a.id === appointmentId);
+
+    if (!appointment) {
+      return;
+    }
+
+    setSelectedAppointment(appointment);
+    navigate("/appointment");
+  }
+
+  function handleDelete(appointmentId: string) {
+    if (!window.confirm("Удалить эту запись?")) {
+      return;
+    }
+
+    deleteAppointment(appointmentId);
+  }
 
   if (dates.length === 0) {
     return (
@@ -52,6 +76,8 @@ function Calendar() {
                     time={appointment.time}
                     title={client?.name ?? "Неизвестный клиент"}
                     subtitle={`${appointment.procedure} · ${appointment.duration} мин`}
+                    onEdit={() => handleEdit(appointment.id)}
+                    onDelete={() => handleDelete(appointment.id)}
                   />
                 );
               })}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import MainLayout from "../../../../layouts/MainLayout/MainLayout";
@@ -17,12 +17,38 @@ import "./AppointmentPage.css";
 
 const NEW_CLIENT_OPTION = "new";
 
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error("timeout"));
+    }, ms);
+
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((error) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+  });
+}
+
 function AppointmentPage() {
   const navigate = useNavigate();
 
   const { clients, addClient } = useClients();
-  const { addAppointment } = useAppointments();
+  const {
+    addAppointment,
+    updateAppointment,
+    getConflict,
+    selectedAppointment,
+    setSelectedAppointment,
+  } = useAppointments();
   const { procedures } = useProcedures();
+
+  const isEditing = Boolean(selectedAppointment);
 
   // Клиент
   const [clientId, setClientId] = useState("");
@@ -41,13 +67,43 @@ function AppointmentPage() {
 
   const [isSaving, setIsSaving] = useState(false);
 
+  // Если пришли редактировать существующую запись — подставляем её данные
+  useEffect(() => {
+    if (!selectedAppointment) {
+      return;
+    }
+
+    setClientId(selectedAppointment.clientId);
+    setDate(selectedAppointment.date);
+    setTime(selectedAppointment.time);
+    setComment(selectedAppointment.comment ?? "");
+
+    const matchingProcedure = procedures.find(
+      (procedure) => procedure.name === selectedAppointment.procedure
+    );
+
+    if (matchingProcedure) {
+      setProcedureId(matchingProcedure.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAppointment]);
+
+  // Уходя со страницы — сбрасываем режим редактирования
+  useEffect(() => {
+    return () => setSelectedAppointment(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const isNewClient = clientId === NEW_CLIENT_OPTION;
   const selectedProcedure = procedures.find(
     (procedure) => procedure.id === procedureId
   );
 
   async function handleSave() {
-   if (isSaving) return;
+    if (isSaving) {
+      return;
+    }
+
     if (!clientId) {
       window.alert("Выберите клиента");
       return;
@@ -68,43 +124,94 @@ function AppointmentPage() {
       return;
     }
 
+    const conflict = getConflict(
+      { date, time, duration: selectedProcedure.duration },
+      selectedAppointment?.id
+    );
+
+    if (conflict) {
+      const conflictClient = clients.find((c) => c.id === conflict.clientId);
+
+      window.alert(
+        `На это время уже есть запись: ${conflictClient?.name ?? "клиент"} — ${conflict.procedure} (${conflict.time})`
+      );
+      return;
+    }
+
     setIsSaving(true);
 
     try {
       let finalClientId: string;
-  
+
       if (isNewClient) {
-        finalClientId = await addClient({
-          name: newClientName,
-          phone: newClientPhone,
-          birthDate: "",
+        finalClientId = await withTimeout(
+          addClient({
+            name: newClientName,
+            phone: newClientPhone,
+            birthDate: "",
 
-          allergies: "Нет",
-          contraindications: "Нет",
-          skin: "Не указано",
+            allergies: "Нет",
+            contraindications: "Нет",
+            skin: "Не указано",
 
-          lastVisit: "Новый клиент",
+            lastVisit: "Новый клиент",
 
-          bonus: 0,
-          photo: "/images/default.jpg",
-        });
+            bonus: 0,
+            photo: "/images/default.jpg",
+          }),
+          15000
+        );
       } else {
         finalClientId = clientId;
       }
 
-      await addAppointment({
-        clientId: finalClientId,
+      if (isEditing && selectedAppointment) {
+        await withTimeout(
+          updateAppointment({
+            id: selectedAppointment.id,
+            clientId: finalClientId,
 
-        procedure: selectedProcedure.name,
-        duration: selectedProcedure.duration,
+            procedure: selectedProcedure.name,
+            duration: selectedProcedure.duration,
 
-        date,
-        time,
+            date,
+            time,
 
-        comment: comment.trim() || undefined,
-      });
+            comment: comment.trim(),
+          }),
+          15000
+        );
+      } else {
+        await withTimeout(
+          addAppointment({
+            clientId: finalClientId,
+
+            procedure: selectedProcedure.name,
+            duration: selectedProcedure.duration,
+
+            date,
+            time,
+
+            comment: comment.trim(),
+          }),
+          15000
+        );
+      }
 
       navigate("/calendar");
+    } catch (error) {
+      console.error("Не удалось сохранить запись:", error);
+
+      if (error instanceof Error && error.message === "timeout") {
+        window.alert(
+          "Сохранение затянулось дольше обычного. Возможно, запись всё же прошла — сейчас открою календарь, проверьте, появилась ли она."
+        );
+        navigate("/calendar");
+      } else {
+        window.alert(
+          "Не получилось сохранить запись. Проверьте интернет-соединение и попробуйте ещё раз."
+        );
+      }
     } finally {
       setIsSaving(false);
     }
@@ -113,7 +220,7 @@ function AppointmentPage() {
   return (
     <MainLayout>
       <div className="appointment-page">
-        <SectionCard title="Основная информация">
+        <SectionCard title={isEditing ? "Редактирование записи" : "Основная информация"}>
           <div className="appointment-field">
             <label className="appointment-field__label">Клиент</label>
 
@@ -121,6 +228,7 @@ function AppointmentPage() {
               className="appointment-field__select"
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
+              disabled={isEditing}
             >
               <option value="" disabled>
                 Выберите клиента
@@ -132,7 +240,9 @@ function AppointmentPage() {
                 </option>
               ))}
 
-              <option value={NEW_CLIENT_OPTION}>+ Новый клиент</option>
+              {!isEditing && (
+                <option value={NEW_CLIENT_OPTION}>+ Новый клиент</option>
+              )}
             </select>
           </div>
 
@@ -196,12 +306,9 @@ function AppointmentPage() {
           />
         </SectionCard>
 
-        <PrimaryButton
-  onClick={handleSave}
-  disabled={isSaving}
->
-  {isSaving ? "Сохраняем..." : "Сохранить"}
-</PrimaryButton>
+        <PrimaryButton onClick={handleSave} disabled={isSaving}>
+          {isSaving ? "Сохраняем..." : isEditing ? "Сохранить изменения" : "Сохранить запись"}
+        </PrimaryButton>
       </div>
     </MainLayout>
   );

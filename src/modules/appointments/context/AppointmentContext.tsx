@@ -13,9 +13,6 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  query,
-  where,
-  getDocs,
 } from "firebase/firestore";
 
 import { db } from "../../../firebase/config";
@@ -38,9 +35,15 @@ type NewAppointment = Omit<Appointment, "id">;
 type AppointmentContextType = {
   appointments: Appointment[];
   loading: boolean;
+  selectedAppointment: Appointment | null;
+  setSelectedAppointment: (appointment: Appointment | null) => void;
   addAppointment: (appointment: NewAppointment) => Promise<void>;
   updateAppointment: (appointment: Appointment) => Promise<void>;
   deleteAppointment: (id: string) => Promise<void>;
+  getConflict: (
+    candidate: { date: string; time: string; duration: number },
+    excludeId?: string
+  ) => Appointment | undefined;
 };
 
 const AppointmentContext = createContext<AppointmentContextType | undefined>(
@@ -53,9 +56,16 @@ type AppointmentProviderProps = {
 
 const COLLECTION_NAME = "appointments";
 
+function toMinutes(time: string) {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
 export function AppointmentProvider({ children }: AppointmentProviderProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -75,22 +85,9 @@ export function AppointmentProvider({ children }: AppointmentProviderProps) {
   }, []);
 
   async function addAppointment(appointment: NewAppointment) {
-  const appointmentsRef = collection(db, COLLECTION_NAME);
-
-  const q = query(
-    appointmentsRef,
-    where("date", "==", appointment.date),
-    where("time", "==", appointment.time)
-  );
-
-  const snapshot = await getDocs(q);
-
-  if (!snapshot.empty) {
-    throw new Error("На это время уже есть запись.");
+    await addDoc(collection(db, COLLECTION_NAME), appointment);
   }
 
-  await addDoc(appointmentsRef, appointment);
-}
   async function updateAppointment(updatedAppointment: Appointment) {
     const { id, ...rest } = updatedAppointment;
     await updateDoc(doc(db, COLLECTION_NAME, id), rest);
@@ -100,14 +97,40 @@ export function AppointmentProvider({ children }: AppointmentProviderProps) {
     await deleteDoc(doc(db, COLLECTION_NAME, id));
   }
 
+  function getConflict(
+    candidate: { date: string; time: string; duration: number },
+    excludeId?: string
+  ) {
+    const candidateStart = toMinutes(candidate.time);
+    const candidateEnd = candidateStart + candidate.duration;
+
+    return appointments.find((appointment) => {
+      if (appointment.id === excludeId) {
+        return false;
+      }
+
+      if (appointment.date !== candidate.date) {
+        return false;
+      }
+
+      const start = toMinutes(appointment.time);
+      const end = start + appointment.duration;
+
+      return candidateStart < end && start < candidateEnd;
+    });
+  }
+
   return (
     <AppointmentContext.Provider
       value={{
         appointments,
         loading,
+        selectedAppointment,
+        setSelectedAppointment,
         addAppointment,
         updateAppointment,
         deleteAppointment,
+        getConflict,
       }}
     >
       {children}

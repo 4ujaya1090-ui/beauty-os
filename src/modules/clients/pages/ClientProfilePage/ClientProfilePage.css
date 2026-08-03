@@ -7,7 +7,9 @@
     gap:24px;
 
     margin-top:24px;
-}.client-history{
+}
+
+.client-history{
     display:flex;
     flex-direction:column;
     gap:12px;
@@ -16,10 +18,17 @@
 .client-history__item{
     display:flex;
     justify-content:space-between;
+    align-items:center;
     gap:16px;
 
     padding:12px 0;
     border-bottom:1px solid rgba(255,255,255,.35);
+}
+
+.client-history__item > div:first-child{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
 }
 
 .client-history__date{
@@ -29,4 +38,24 @@
 
 .client-history__procedure{
     font-weight:500;
+}
+
+.client-history__actions{
+    display:flex;
+    gap:8px;
+    flex-shrink:0;
+}
+
+.client-history__icon{
+    width:28px;
+    height:28px;
+
+    border:1px solid rgba(255,255,255,.45);
+    border-radius:10px;
+
+    background:rgba(255,255,255,.35);
+    color:var(--color-text-light);
+
+    cursor:pointer;
+    font-size:13px;
 }
