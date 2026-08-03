@@ -1,75 +1,101 @@
-# React + TypeScript + Vite
+# Beauty OS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Beauty OS** — модульная платформа для специалистов сферы услуг и их клиентов.
 
-Currently, two official plugins are available:
+Проект объединяет управление клиентской базой, записью, услугами, рекомендациями, историей посещений, фотографиями, аналитикой и личным кабинетом клиента в единой системе.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+# Что такое Beauty OS
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Beauty OS — это не просто CRM.
 
-## Expanding the ESLint configuration
+Это платформа, объединяющая специалиста и клиента в одном приложении.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Каждый пользователь получает собственный интерфейс, соответствующий своей роли.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Роли пользователей
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Специалист
 
-```
+Рабочее пространство для ведения бизнеса.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Клиент
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Личный кабинет с историей услуг, рекомендациями и возможностью записи.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
 
-```
+# Возможности специалистов
+
+- управление клиентами
+- календарь и запись
+- процедуры
+- рекомендации
+- фотографии
+- история посещений
+- прайс-лист
+- аналитика
+- документы
+- заметки
+
+---
+
+# Возможности клиентов
+
+- личный кабинет
+- онлайн-запись
+- история посещений
+- рекомендации специалиста
+- фотографии "до / после"
+- бонусная система
+- уведомления
+- документы
+
+---
+
+# Поддерживаемые направления
+
+Beauty OS разрабатывается как универсальная платформа для специалистов сферы услуг.
+
+Например:
+
+- косметологи
+- массажисты
+- мастера маникюра
+- парикмахеры
+- барберы
+- визажисты
+- психологи
+- нутрициологи
+- тренеры
+
+Архитектура платформы позволяет использовать её и для других направлений.
+
+---
+
+# Технологии
+
+- React
+- TypeScript
+- Firebase
+- Vite
+- PWA
+
+---
+
+# Статус проекта
+
+Проект находится в активной разработке.
+
+Архитектура продолжает развиваться.
+
+Некоторые функции находятся на стадии проектирования.
+
+---
+
+# Roadmap
+
+Подробный план разработки находится в файле ROADMAP.md.

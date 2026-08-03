@@ -41,7 +41,7 @@ const todayCount = appointments.filter((a) => a.date === todayIso).length;
 
   return (
     <>
-      <Header userName="Лина" />
+      <Header />
 
       <GlassCard>
         <h2 className="next-title">Следующая запись</h2>

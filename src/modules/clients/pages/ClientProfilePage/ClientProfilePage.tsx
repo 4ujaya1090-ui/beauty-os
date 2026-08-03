@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import MainLayout from "../../../../layouts/MainLayout/MainLayout";
@@ -6,6 +7,8 @@ import PrimaryButton from "../../../shared/components/PrimaryButton/PrimaryButto
 
 import MedicalCard from "../../components/MedicalCard/MedicalCard";
 import ClientInfoPanel from "../../components/ClientInfoPanel/ClientInfoPanel";
+
+import PhotoGallery from "../../../appointments/components/PhotoGallery/PhotoGallery";
 
 import { useClients } from "../../context/ClientContext";
 import { useAppointments } from "../../../appointments/context/AppointmentContext";
@@ -35,6 +38,8 @@ function ClientProfilePage() {
     deleteAppointment,
     setSelectedAppointment,
   } = useAppointments();
+
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (!selectedClient) {
     return (
@@ -83,6 +88,12 @@ function ClientProfilePage() {
     navigate("/clients");
   }
 
+  function toggleExpanded(appointmentId: string) {
+    setExpandedId((current) =>
+      current === appointmentId ? null : appointmentId
+    );
+  }
+
   return (
     <MainLayout>
 
@@ -101,32 +112,48 @@ function ClientProfilePage() {
           ) : (
             <div className="client-history">
               {clientHistory.map((appointment) => (
-                <div className="client-history__item" key={appointment.id}>
-                  <div>
-                    <span className="client-history__date">
-                      {formatDate(appointment.date)} · {appointment.time}
-                    </span>
+                <div className="client-history__row" key={appointment.id}>
+                  <div className="client-history__item">
+                    <div>
+                      <span className="client-history__date">
+                        {formatDate(appointment.date)} · {appointment.time}
+                      </span>
 
-                    <span className="client-history__procedure">
-                      {appointment.procedure} · {appointment.duration} мин
-                    </span>
+                      <span className="client-history__procedure">
+                        {appointment.procedure} · {appointment.duration} мин
+                      </span>
+                    </div>
+
+                    <div className="client-history__actions">
+                      <button
+                        className="client-history__icon"
+                        onClick={() => toggleExpanded(appointment.id)}
+                      >
+                        📷 {appointment.photos?.length ?? 0}
+                      </button>
+
+                      <button
+                        className="client-history__icon"
+                        onClick={() => handleEditAppointment(appointment.id)}
+                      >
+                        ✎
+                      </button>
+
+                      <button
+                        className="client-history__icon"
+                        onClick={() => handleDeleteAppointment(appointment.id)}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="client-history__actions">
-                    <button
-                      className="client-history__icon"
-                      onClick={() => handleEditAppointment(appointment.id)}
-                    >
-                      ✎
-                    </button>
-
-                    <button
-                      className="client-history__icon"
-                      onClick={() => handleDeleteAppointment(appointment.id)}
-                    >
-                      ✕
-                    </button>
-                  </div>
+                  {expandedId === appointment.id && (
+                    <PhotoGallery
+                      appointmentId={appointment.id}
+                      photos={appointment.photos ?? []}
+                    />
+                  )}
                 </div>
               ))}
             </div>

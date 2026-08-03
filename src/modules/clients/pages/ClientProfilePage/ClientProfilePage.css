@@ -15,14 +15,16 @@
     gap:12px;
 }
 
+.client-history__row{
+    padding:12px 0;
+    border-bottom:1px solid rgba(255,255,255,.35);
+}
+
 .client-history__item{
     display:flex;
     justify-content:space-between;
     align-items:center;
     gap:16px;
-
-    padding:12px 0;
-    border-bottom:1px solid rgba(255,255,255,.35);
 }
 
 .client-history__item > div:first-child{
@@ -47,8 +49,8 @@
 }
 
 .client-history__icon{
-    width:28px;
     height:28px;
+    padding:0 8px;
 
     border:1px solid rgba(255,255,255,.45);
     border-radius:10px;

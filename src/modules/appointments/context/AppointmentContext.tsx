@@ -13,6 +13,8 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 
 import { db } from "../../../firebase/config";
@@ -28,6 +30,7 @@ export type Appointment = {
   time: string;
 
   comment?: string;
+  photos?: string[];
 };
 
 type NewAppointment = Omit<Appointment, "id">;
@@ -40,6 +43,8 @@ type AppointmentContextType = {
   addAppointment: (appointment: NewAppointment) => Promise<void>;
   updateAppointment: (appointment: Appointment) => Promise<void>;
   deleteAppointment: (id: string) => Promise<void>;
+  addPhoto: (appointmentId: string, url: string) => Promise<void>;
+  removePhoto: (appointmentId: string, url: string) => Promise<void>;
   getConflict: (
     candidate: { date: string; time: string; duration: number },
     excludeId?: string
@@ -97,6 +102,18 @@ export function AppointmentProvider({ children }: AppointmentProviderProps) {
     await deleteDoc(doc(db, COLLECTION_NAME, id));
   }
 
+  async function addPhoto(appointmentId: string, url: string) {
+    await updateDoc(doc(db, COLLECTION_NAME, appointmentId), {
+      photos: arrayUnion(url),
+    });
+  }
+
+  async function removePhoto(appointmentId: string, url: string) {
+    await updateDoc(doc(db, COLLECTION_NAME, appointmentId), {
+      photos: arrayRemove(url),
+    });
+  }
+
   function getConflict(
     candidate: { date: string; time: string; duration: number },
     excludeId?: string
@@ -130,6 +147,8 @@ export function AppointmentProvider({ children }: AppointmentProviderProps) {
         addAppointment,
         updateAppointment,
         deleteAppointment,
+        addPhoto,
+        removePhoto,
         getConflict,
       }}
     >

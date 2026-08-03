@@ -1,0 +1,29 @@
+.profile-setup-page {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.profile-setup-card {
+  width: 100%;
+  max-width: 360px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.profile-setup-title {
+  font-size: 28px;
+  text-align: center;
+}
+
+.profile-setup-subtitle {
+  color: var(--color-text-light);
+  text-align: center;
+  margin-bottom: 8px;
+}

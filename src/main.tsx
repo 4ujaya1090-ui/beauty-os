@@ -8,20 +8,23 @@ import { ClientProvider } from "./modules/clients/context/ClientContext";
 import { AppointmentProvider } from "./modules/appointments/context/AppointmentContext";
 import { ProcedureProvider } from "./modules/procedures/context/ProcedureContext";
 import { AuthProvider } from "./modules/auth/context/AuthContext";
+import { ProfileProvider } from "./modules/auth/context/ProfileContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
 
     <AuthProvider>
-      <ClientProvider>
-        <ProcedureProvider>
-          <AppointmentProvider>
+      <ProfileProvider>
+        <ClientProvider>
+          <ProcedureProvider>
+            <AppointmentProvider>
 
-            <App />
+              <App />
 
-          </AppointmentProvider>
-        </ProcedureProvider>
-      </ClientProvider>
+            </AppointmentProvider>
+          </ProcedureProvider>
+        </ClientProvider>
+      </ProfileProvider>
     </AuthProvider>
 
   </StrictMode>

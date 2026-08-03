@@ -1,7 +1,8 @@
 import LoginPage from "./modules/auth/pages/LoginPage/LoginPage";
+import ProfileSetupPage from "./modules/auth/pages/ProfileSetupPage/ProfileSetupPage";
 import { useAuth } from "./modules/auth/context/AuthContext";
+import { useProfile } from "./modules/auth/context/ProfileContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import HomePage from "./modules/shared/pages/HomePage/HomePage";
 import AppointmentPage from "./modules/appointments/pages/AppointmentPage/AppointmentPage";
 import CalendarPage from "./modules/appointments/pages/CalendarPage/CalendarPage";
@@ -14,6 +15,7 @@ import EditClientPage from "./modules/clients/pages/EditClientPage/EditClientPag
 
 function App() {
   const { user, loading } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
 
   if (loading) {
     return null;
@@ -21,6 +23,14 @@ function App() {
 
   if (!user) {
     return <LoginPage />;
+  }
+
+  if (profileLoading) {
+    return null;
+  }
+
+  if (!profile) {
+    return <ProfileSetupPage />;
   }
 
   return (
