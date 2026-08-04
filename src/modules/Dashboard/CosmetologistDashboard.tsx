@@ -38,7 +38,7 @@ function toLocalIsoDate(d: Date) {
 
 const todayIso = toLocalIsoDate(now);
 const todayCount = appointments.filter((a) => a.date === todayIso).length;
-
+const totalBonuses = clients.reduce((sum, client) => sum + client.bonus, 0);
   return (
     <>
       <Header />
@@ -63,7 +63,7 @@ const todayCount = appointments.filter((a) => a.date === todayIso).length;
           value={String(clients.length)}
           onClick={() => navigate("/clients")}
         />
-        <StatCard title="Бонусы" value="1250" />
+        <StatCard title="Бонусы" value={String(totalBonuses)} />
         <StatCard title="Статьи" value="25" />
       </section>
       <QuickActions />
