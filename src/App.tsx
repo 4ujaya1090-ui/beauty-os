@@ -13,6 +13,11 @@ import ClientProfilePage from "./modules/clients/pages/ClientProfilePage/ClientP
 import NewClientPage from "./modules/clients/pages/NewClientPage/NewClientPage";
 import EditClientPage from "./modules/clients/pages/EditClientPage/EditClientPage";
 
+import ArticlesPage from "./modules/articles/pages/ArticlesPage/ArticlesPage";
+import NewArticlePage from "./modules/articles/pages/NewArticlePage/NewArticlePage";
+import ArticlePage from "./modules/articles/pages/ArticlePage/ArticlePage";
+import EditArticlePage from "./modules/articles/pages/EditArticlePage/EditArticlePage";
+
 function App() {
   const { user, loading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
@@ -71,6 +76,26 @@ function App() {
         <Route
           path="/edit-client"
           element={<EditClientPage />}
+        />
+
+        <Route
+          path="/articles"
+          element={<ArticlesPage />}
+        />
+
+        <Route
+          path="/articles/new"
+          element={<NewArticlePage />}
+        />
+
+        <Route
+          path="/article"
+          element={<ArticlePage />}
+        />
+
+        <Route
+          path="/edit-article"
+          element={<EditArticlePage />}
         />
       </Routes>
     </BrowserRouter>

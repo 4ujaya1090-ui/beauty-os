@@ -6,6 +6,7 @@ import QuickActions from "../shared/components/QuickActions/QuickActions";
 
 import { useAppointments } from "../appointments/context/AppointmentContext";
 import { useClients } from "../clients/context/ClientContext";
+import { useArticles } from "../articles/context/ArticleContext";
 
 import "./CosmetologistDashboard.css";
 
@@ -14,6 +15,7 @@ function CosmetologistDashboard() {
 
   const { appointments } = useAppointments();
   const { clients } = useClients();
+  const { articles } = useArticles();
 
   const now = new Date();
 
@@ -64,7 +66,11 @@ const totalBonuses = clients.reduce((sum, client) => sum + client.bonus, 0);
           onClick={() => navigate("/clients")}
         />
         <StatCard title="Бонусы" value={String(totalBonuses)} />
-        <StatCard title="Статьи" value="25" />
+        <StatCard
+          title="Статьи"
+          value={String(articles.length)}
+          onClick={() => navigate("/articles")}
+        />
       </section>
       <QuickActions />
     </>

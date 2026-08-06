@@ -1,0 +1,18 @@
+.new-article-page{
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+
+    margin-top:24px;
+}
+
+.new-article-page__checkbox{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    margin-top:8px;
+
+    color:var(--color-text-light);
+    font-size:14px;
+}
