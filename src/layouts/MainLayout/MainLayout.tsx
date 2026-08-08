@@ -5,9 +5,10 @@ import "./MainLayout.css";
 
 type MainLayoutProps = {
   children: ReactNode;
+  topAction?: ReactNode;
 };
 
-function MainLayout({ children }: MainLayoutProps) {
+function MainLayout({ children, topAction }: MainLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -16,9 +17,20 @@ function MainLayout({ children }: MainLayoutProps) {
   return (
     <main className="layout">
       {!isHome && (
-        <button className="layout__home" onClick={() => navigate("/")}>
-          ← На главную
-        </button>
+        <div className="layout__top">
+          <button
+            className="layout__home"
+            onClick={() => navigate("/")}
+          >
+            ← На главную
+          </button>
+
+          {topAction && (
+            <div className="layout__action">
+              {topAction}
+            </div>
+          )}
+        </div>
       )}
 
       {children}
