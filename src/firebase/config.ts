@@ -17,6 +17,13 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
- 
 });
 export const storage = getStorage(app);
+
+// Отдельное, временное подключение к Firebase — используется,
+// когда специалист создаёт логин клиенту, чтобы не потерять
+// собственную сессию (Firebase иначе переключает вход на нового пользователя).
+export function createSecondaryApp() {
+  const name = `secondary-${Date.now()}`;
+  return initializeApp(firebaseConfig, name);
+}

@@ -1,0 +1,31 @@
+.client-appointments-page{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+
+    margin-top:24px;
+}
+
+.client-appointments-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.client-appointments-item{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+
+    padding:12px 0;
+    border-bottom:1px solid rgba(255,255,255,.35);
+}
+
+.client-appointments-item__date{
+    color:var(--color-text-light);
+    font-size:14px;
+}
+
+.client-appointments-item__procedure{
+    font-weight:500;
+}

@@ -9,25 +9,29 @@ import { AppointmentProvider } from "./modules/appointments/context/AppointmentC
 import { ProcedureProvider } from "./modules/procedures/context/ProcedureContext";
 import { AuthProvider } from "./modules/auth/context/AuthContext";
 import { ProfileProvider } from "./modules/auth/context/ProfileContext";
+import { RoleProvider } from "./modules/auth/context/RoleContext";
 import { ArticleProvider } from "./modules/articles/context/ArticleContext";
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
 
-   <AuthProvider>
-  <ProfileProvider>
-    <ClientProvider>
-      <ProcedureProvider>
-        <AppointmentProvider>
-          <ArticleProvider>
+    <AuthProvider>
+      <ProfileProvider>
+        <RoleProvider>
+          <ClientProvider>
+            <ProcedureProvider>
+              <AppointmentProvider>
+                <ArticleProvider>
 
-            <App />
+                  <App />
 
-          </ArticleProvider>
-        </AppointmentProvider>
-      </ProcedureProvider>
-    </ClientProvider>
-  </ProfileProvider>
-</AuthProvider>
+                </ArticleProvider>
+              </AppointmentProvider>
+            </ProcedureProvider>
+          </ClientProvider>
+        </RoleProvider>
+      </ProfileProvider>
+    </AuthProvider>
 
   </StrictMode>
 );

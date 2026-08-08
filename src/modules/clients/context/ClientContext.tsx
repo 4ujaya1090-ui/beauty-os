@@ -15,7 +15,15 @@ import {
   doc,
 } from "firebase/firestore";
 
-import { db } from "../../../firebase/config";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+
+import { deleteApp } from "firebase/app";
+
+import { db, createSecondaryApp } from "../../../firebase/config";
 
 export type Client = {
   id: string;
@@ -36,6 +44,9 @@ export type Client = {
   // Программа лояльности
   bonus: number;
   photo: string;
+
+  // Связь с логином клиента в Firebase Auth (если создан)
+  authUid?: string;
 };
 
 type NewClient = Omit<Client, "id">;
@@ -48,6 +59,11 @@ type ClientContextType = {
   addClient: (client: NewClient) => Promise<string>;
   updateClient: (client: Client) => Promise<void>;
   deleteClient: (id: string) => Promise<void>;
+  createClientLogin: (
+    clientId: string,
+    email: string,
+    password: string
+  ) => Promise<void>;
 };
 
 const ClientContext = createContext<ClientContextType | undefined>(undefined);
@@ -97,6 +113,35 @@ export function ClientProvider({ children }: ClientProviderProps) {
     setSelectedClient(null);
   }
 
+  async function createClientLogin(
+    clientId: string,
+    email: string,
+    password: string
+  ) {
+    // Создаём пользователя через ОТДЕЛЬНОЕ подключение к Firebase,
+    // чтобы не потерять собственную сессию специалиста.
+    const secondaryApp = createSecondaryApp();
+    const secondaryAuth = getAuth(secondaryApp);
+
+    try {
+      const credential = await createUserWithEmailAndPassword(
+        secondaryAuth,
+        email,
+        password
+      );
+
+      const newUid = credential.user.uid;
+
+      await signOut(secondaryAuth);
+
+      await updateDoc(doc(db, COLLECTION_NAME, clientId), {
+        authUid: newUid,
+      });
+    } finally {
+      await deleteApp(secondaryApp);
+    }
+  }
+
   return (
     <ClientContext.Provider
       value={{
@@ -107,6 +152,7 @@ export function ClientProvider({ children }: ClientProviderProps) {
         addClient,
         updateClient,
         deleteClient,
+        createClientLogin,
       }}
     >
       {children}

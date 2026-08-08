@@ -1,0 +1,27 @@
+.create-client-login{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.create-client-login--done{
+    padding:14px 16px;
+
+    border-radius:16px;
+    background:rgba(163,201,168,.2);
+
+    font-size:14px;
+    line-height:1.5;
+}
+
+.create-client-login__credentials{
+    margin-top:8px;
+
+    padding:10px 14px;
+    border-radius:12px;
+
+    background:rgba(255,255,255,.5);
+
+    font-weight:600;
+    user-select:all;
+}

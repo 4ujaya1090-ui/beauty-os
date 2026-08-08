@@ -2,6 +2,7 @@ import LoginPage from "./modules/auth/pages/LoginPage/LoginPage";
 import ProfileSetupPage from "./modules/auth/pages/ProfileSetupPage/ProfileSetupPage";
 import { useAuth } from "./modules/auth/context/AuthContext";
 import { useProfile } from "./modules/auth/context/ProfileContext";
+import { useRole } from "./modules/auth/context/RoleContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./modules/shared/pages/HomePage/HomePage";
 import AppointmentPage from "./modules/appointments/pages/AppointmentPage/AppointmentPage";
@@ -18,9 +19,15 @@ import NewArticlePage from "./modules/articles/pages/NewArticlePage/NewArticlePa
 import ArticlePage from "./modules/articles/pages/ArticlePage/ArticlePage";
 import EditArticlePage from "./modules/articles/pages/EditArticlePage/EditArticlePage";
 
+import ClientDashboardPage from "./modules/clientCabinet/pages/ClientDashboardPage/ClientDashboardPage";
+import ClientArticlePage from "./modules/clientCabinet/pages/ClientArticlePage/ClientArticlePage";
+import ClientAppointmentsPage from "./modules/clientCabinet/pages/ClientAppointmentsPage/ClientAppointmentsPage";
+import ClientArticlesPage from "./modules/clientCabinet/pages/ClientArticlesPage/ClientArticlesPage";
+
 function App() {
   const { user, loading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
+  const { clientRecord, loading: roleLoading } = useRole();
 
   if (loading) {
     return null;
@@ -30,8 +37,33 @@ function App() {
     return <LoginPage />;
   }
 
-  if (profileLoading) {
+  if (profileLoading || roleLoading) {
     return null;
+  }
+
+  if (clientRecord) {
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<ClientDashboardPage />} />
+
+          <Route
+            path="/my/article"
+            element={<ClientArticlePage />}
+          />
+
+          <Route
+            path="/my/appointments"
+            element={<ClientAppointmentsPage />}
+          />
+
+          <Route
+            path="/my/articles"
+            element={<ClientArticlesPage />}
+          />
+        </Routes>
+      </BrowserRouter>
+    );
   }
 
   if (!profile) {

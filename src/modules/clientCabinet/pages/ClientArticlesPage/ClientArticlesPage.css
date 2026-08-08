@@ -1,0 +1,31 @@
+.client-articles-page{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+
+    margin-top:24px;
+}
+
+.client-articles-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.client-articles-item{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+
+    padding:12px 14px;
+    border-radius:14px;
+
+    background:rgba(255,255,255,.3);
+
+    cursor:pointer;
+}
+
+.client-articles-item span{
+    color:var(--color-text-light);
+    font-size:13px;
+}
