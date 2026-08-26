@@ -18,7 +18,7 @@ function formatDate(isoDate: string) {
 
 function ClientAppointmentsPage() {
   const { clientRecord } = useRole();
-  const { appointments } = useAppointments();
+  const { appointments, deleteAppointment } = useAppointments();
 
   if (!clientRecord) {
     return null;
@@ -35,6 +35,14 @@ function ClientAppointmentsPage() {
         new Date(`${b.date}T${b.time}`).getTime()
     );
 
+  function handleCancel(appointmentId: string) {
+    if (!window.confirm("Отменить эту запись?")) {
+      return;
+    }
+
+    deleteAppointment(appointmentId);
+  }
+
   return (
     <MainLayout>
       <div className="client-appointments-page">
@@ -45,13 +53,22 @@ function ClientAppointmentsPage() {
             <div className="client-appointments-list">
               {upcoming.map((a) => (
                 <div className="client-appointments-item" key={a.id}>
-                  <span className="client-appointments-item__date">
-                    {formatDate(a.date)} · {a.time}
-                  </span>
+                  <div>
+                    <span className="client-appointments-item__date">
+                      {formatDate(a.date)} · {a.time}
+                    </span>
 
-                  <span className="client-appointments-item__procedure">
-                    {a.procedure} · {a.duration} мин
-                  </span>
+                    <span className="client-appointments-item__procedure">
+                      {a.procedure} · {a.duration} мин
+                    </span>
+                  </div>
+
+                  <button
+                    className="client-appointments-item__cancel"
+                    onClick={() => handleCancel(a.id)}
+                  >
+                    Отменить
+                  </button>
                 </div>
               ))}
             </div>

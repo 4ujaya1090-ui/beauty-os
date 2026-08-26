@@ -15,9 +15,14 @@ import {
   doc,
   arrayUnion,
   arrayRemove,
+  query,
+  where,
 } from "firebase/firestore";
 
 import { db } from "../../../firebase/config";
+
+import { useProfile } from "../../auth/context/ProfileContext";
+import { useRole } from "../../auth/context/RoleContext";
 
 export type Appointment = {
   id: string;
@@ -51,9 +56,9 @@ type AppointmentContextType = {
   ) => Appointment | undefined;
 };
 
-const AppointmentContext = createContext<AppointmentContextType | undefined>(
-  undefined
-);
+const AppointmentContext = createContext<
+  AppointmentContextType | undefined
+>(undefined);
 
 type AppointmentProviderProps = {
   children: ReactNode;
@@ -66,28 +71,88 @@ function toMinutes(time: string) {
   return hours * 60 + minutes;
 }
 
-export function AppointmentProvider({ children }: AppointmentProviderProps) {
+export function AppointmentProvider({
+  children,
+}: AppointmentProviderProps) {
+  const { profile, loading: profileLoading } = useProfile();
+  const { clientRecord, loading: roleLoading } = useRole();
+
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, COLLECTION_NAME),
-      (snapshot) => {
-        const items = snapshot.docs.map((docSnap) => ({
-          id: docSnap.id,
-          ...(docSnap.data() as Omit<Appointment, "id">),
-        }));
+    if (profileLoading || roleLoading) {
+      setLoading(true);
+      return;
+    }
 
-        setAppointments(items);
-        setLoading(false);
-      }
-    );
+    // Специалист:
+    // профиль существует, клиентской записи нет.
+    if (profile && !clientRecord) {
+      const unsubscribe = onSnapshot(
+        collection(db, COLLECTION_NAME),
+        (snapshot) => {
+          const items = snapshot.docs.map((docSnap) => ({
+            id: docSnap.id,
+            ...(docSnap.data() as Omit<Appointment, "id">),
+          }));
 
-    return unsubscribe;
-  }, []);
+          setAppointments(items);
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Appointments listener error:", error);
+          setAppointments([]);
+          setLoading(false);
+        }
+      );
+
+      return unsubscribe;
+    }
+
+    // Клиент:
+    // читаем только его собственные записи.
+    if (clientRecord) {
+      const clientAppointmentsQuery = query(
+        collection(db, COLLECTION_NAME),
+        where("clientId", "==", clientRecord.id)
+      );
+
+      const unsubscribe = onSnapshot(
+        clientAppointmentsQuery,
+        (snapshot) => {
+          const items = snapshot.docs.map((docSnap) => ({
+            id: docSnap.id,
+            ...(docSnap.data() as Omit<Appointment, "id">),
+          }));
+
+          setAppointments(items);
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Client appointments listener error:", error);
+          setAppointments([]);
+          setLoading(false);
+        }
+      );
+
+      return unsubscribe;
+    }
+
+    // Посторонний аккаунт:
+    // не специалист и не клиент.
+    setAppointments([]);
+    setLoading(false);
+
+    return undefined;
+  }, [
+    profile,
+    profileLoading,
+    clientRecord,
+    roleLoading,
+  ]);
 
   async function addAppointment(appointment: NewAppointment) {
     await addDoc(collection(db, COLLECTION_NAME), appointment);
@@ -95,6 +160,7 @@ export function AppointmentProvider({ children }: AppointmentProviderProps) {
 
   async function updateAppointment(updatedAppointment: Appointment) {
     const { id, ...rest } = updatedAppointment;
+
     await updateDoc(doc(db, COLLECTION_NAME, id), rest);
   }
 
@@ -115,7 +181,11 @@ export function AppointmentProvider({ children }: AppointmentProviderProps) {
   }
 
   function getConflict(
-    candidate: { date: string; time: string; duration: number },
+    candidate: {
+      date: string;
+      time: string;
+      duration: number;
+    },
     excludeId?: string
   ) {
     const candidateStart = toMinutes(candidate.time);
@@ -161,7 +231,9 @@ export function useAppointments() {
   const context = useContext(AppointmentContext);
 
   if (!context) {
-    throw new Error("useAppointments must be used inside AppointmentProvider");
+    throw new Error(
+      "useAppointments must be used inside AppointmentProvider"
+    );
   }
 
   return context;

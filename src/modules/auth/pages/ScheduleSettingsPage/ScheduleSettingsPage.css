@@ -1,0 +1,64 @@
+.schedule-settings-page{
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+
+    margin-top:24px;
+}
+
+.schedule-settings__hint{
+    color:var(--color-text-light);
+    font-size:14px;
+
+    margin-bottom:14px;
+}
+
+.schedule-settings__days{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+
+    margin-bottom:20px;
+}
+
+.schedule-settings__day{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+
+    padding-bottom:12px;
+    border-bottom:1px solid rgba(255,255,255,.35);
+}
+
+.schedule-settings__checkbox{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    min-width:160px;
+}
+
+.schedule-settings__time{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.schedule-settings__time input{
+    padding:8px 10px;
+
+    border:1px solid rgba(255,255,255,.45);
+    border-radius:12px;
+
+    background:rgba(255,255,255,.35);
+    color:var(--color-text);
+
+    font-size:14px;
+}
+
+.schedule-settings__day-off{
+    color:var(--color-text-light);
+    font-size:14px;
+}

@@ -1,9 +1,12 @@
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/context/AuthContext";
 import { useProfile } from "../../../auth/context/ProfileContext";
 
 import "./Header.css";
 
 function Header() {
+  const navigate = useNavigate();
+
   const { logout } = useAuth();
   const { profile } = useProfile();
 
@@ -22,9 +25,21 @@ function Header() {
           </p>
         </div>
 
-        <button className="header__logout" onClick={() => logout()}>
-          Выйти
-        </button>
+        <div className="header__actions">
+          <button
+            className="header__button"
+            onClick={() => logout()}
+          >
+            Выйти
+          </button>
+
+          <button
+            className="header__button"
+            onClick={() => navigate("/settings/schedule")}
+          >
+            Настройки
+          </button>
+        </div>
       </div>
     </header>
   );

@@ -1,8 +1,13 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import MainLayout from "../../../../layouts/MainLayout/MainLayout";
+
 import GlassCard from "../../../shared/components/GlassCard/GlassCard";
 import SectionCard from "../../../shared/components/SectionCard/SectionCard";
+
+import { createTelegramLink } from "../../../clients/services/telegramService";
+import { getTelegramSubscription } from "../../../clients/services/telegramSubscriptionService";
 
 import { useAuth } from "../../../auth/context/AuthContext";
 import { useRole } from "../../../auth/context/RoleContext";
@@ -12,8 +17,18 @@ import { useArticles } from "../../../articles/context/ArticleContext";
 import "./ClientDashboardPage.css";
 
 const MONTHS = [
-  "января", "февраля", "марта", "апреля", "мая", "июня",
-  "июля", "августа", "сентября", "октября", "ноября", "декабря",
+  "января",
+  "февраля",
+  "марта",
+  "апреля",
+  "мая",
+  "июня",
+  "июля",
+  "августа",
+  "сентября",
+  "октября",
+  "ноября",
+  "декабря",
 ];
 
 function formatDate(isoDate: string) {
@@ -29,8 +44,72 @@ function ClientDashboardPage() {
   const { appointments } = useAppointments();
   const { articles, setSelectedArticle } = useArticles();
 
+  const [telegramConnected, setTelegramConnected] = useState(false);
+  const [telegramLoading, setTelegramLoading] = useState(true);
+
+  const clientId = clientRecord?.id ?? "";
+
+  useEffect(() => {
+    if (!clientId) {
+      setTelegramConnected(false);
+      setTelegramLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadTelegramSubscription() {
+      try {
+        const subscription =
+          await getTelegramSubscription(clientId);
+
+        if (!cancelled) {
+          setTelegramConnected(
+            subscription?.connected === true
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Telegram subscription load error:",
+          error
+        );
+
+        if (!cancelled) {
+          setTelegramConnected(false);
+        }
+      } finally {
+        if (!cancelled) {
+          setTelegramLoading(false);
+        }
+      }
+    }
+
+    loadTelegramSubscription();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [clientId]);
+
   if (!clientRecord) {
     return null;
+  }
+
+  async function handleTelegramConnect() {
+    try {
+      const telegramUrl = await createTelegramLink(clientId);
+
+      window.location.href = telegramUrl;
+    } catch (error) {
+      console.error(
+        "Telegram connection error:",
+        error
+      );
+
+      alert(
+        "Не удалось подготовить подключение Telegram."
+      );
+    }
   }
 
   const now = new Date();
@@ -51,7 +130,9 @@ function ClientDashboardPage() {
 
   const pastAppointments = [...myAppointments]
     .filter((a) => new Date(`${a.date}T${a.time}`) < now)
-    .sort((a, b) => `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`));
+    .sort((a, b) =>
+      `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`)
+    );
 
   const publishedArticles = [...articles]
     .filter((a) => a.published)
@@ -77,7 +158,10 @@ function ClientDashboardPage() {
             <h1 className="client-dashboard__title">
               Здравствуйте, {clientRecord.name}
             </h1>
-            <p className="client-dashboard__subtitle">Ваш личный кабинет</p>
+
+            <p className="client-dashboard__subtitle">
+              Ваш личный кабинет
+            </p>
           </div>
 
           <button
@@ -89,11 +173,39 @@ function ClientDashboardPage() {
         </div>
 
         <GlassCard>
+  <div className="client-dashboard__telegram">
+    <p className="client-dashboard__telegram-label">
+      Уведомления с Telegram
+    </p>
+
+    <button
+  className="client-dashboard__telegram-button"
+  onClick={handleTelegramConnect}
+  disabled={telegramLoading || telegramConnected}
+>
+  {telegramLoading
+    ? "Проверка..."
+    : telegramConnected
+      ? "Подключён"
+      : "Подключить"}
+</button>
+  </div>
+</GlassCard>
+
+        <GlassCard>
           <p className="client-dashboard__bonus-label">Ваши бонусы</p>
+
           <h2 className="client-dashboard__bonus-value">
             {clientRecord.bonus}
           </h2>
         </GlassCard>
+
+        <button
+          className="client-dashboard__book"
+          onClick={() => navigate("/my/booking")}
+        >
+          + Записаться на приём
+        </button>
 
         <div
           className="client-dashboard__clickable"
@@ -125,10 +237,14 @@ function ClientDashboardPage() {
           ) : (
             <div className="client-dashboard__history">
               {pastAppointments.map((a) => (
-                <div className="client-dashboard__history-item" key={a.id}>
+                <div
+                  className="client-dashboard__history-item"
+                  key={a.id}
+                >
                   <span>
                     {formatDate(a.date)} · {a.time}
                   </span>
+
                   <span>{a.procedure}</span>
                 </div>
               ))}

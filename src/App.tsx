@@ -1,9 +1,11 @@
+import ScheduleSettingsPage from "./modules/auth/pages/ScheduleSettingsPage/ScheduleSettingsPage";
 import LoginPage from "./modules/auth/pages/LoginPage/LoginPage";
 import ProfileSetupPage from "./modules/auth/pages/ProfileSetupPage/ProfileSetupPage";
 import { useAuth } from "./modules/auth/context/AuthContext";
 import { useProfile } from "./modules/auth/context/ProfileContext";
 import { useRole } from "./modules/auth/context/RoleContext";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { SPECIALIST_UID } from "./modules/auth/specialistUid";
+import { BrowserRouter, Routes, Route } from "react-router-dom";;
 import HomePage from "./modules/shared/pages/HomePage/HomePage";
 import AppointmentPage from "./modules/appointments/pages/AppointmentPage/AppointmentPage";
 import CalendarPage from "./modules/appointments/pages/CalendarPage/CalendarPage";
@@ -23,9 +25,10 @@ import ClientDashboardPage from "./modules/clientCabinet/pages/ClientDashboardPa
 import ClientArticlePage from "./modules/clientCabinet/pages/ClientArticlePage/ClientArticlePage";
 import ClientAppointmentsPage from "./modules/clientCabinet/pages/ClientAppointmentsPage/ClientAppointmentsPage";
 import ClientArticlesPage from "./modules/clientCabinet/pages/ClientArticlesPage/ClientArticlesPage";
+import ClientBookingPage from "./modules/clientCabinet/pages/ClientBookingPage/ClientBookingPage";
 
 function App() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const { clientRecord, loading: roleLoading } = useRole();
 
@@ -61,20 +64,39 @@ function App() {
             path="/my/articles"
             element={<ClientArticlesPage />}
           />
+
+          <Route
+            path="/my/booking"
+            element={<ClientBookingPage />}
+          />
         </Routes>
       </BrowserRouter>
     );
   }
 
   if (!profile) {
+  if (user.uid === SPECIALIST_UID) {
     return <ProfileSetupPage />;
   }
+
+  return (
+    <div style={{ padding: 32, textAlign: "center" }}>
+      <p>Доступ не настроен.</p>
+      <p>Обратитесь к специалисту, чтобы вам создали вход в систему.</p>
+      <button onClick={() => logout()}>Выйти</button>
+    </div>
+  );
+}
 
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
 
+        <Route
+          path="/settings/schedule"
+          element={<ScheduleSettingsPage />}
+        />
         <Route
           path="/appointment"
           element={<AppointmentPage />}

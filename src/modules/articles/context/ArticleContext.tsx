@@ -13,9 +13,12 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  query,
+  where,
 } from "firebase/firestore";
 
 import { db } from "../../../firebase/config";
+import { useProfile } from "../../auth/context/ProfileContext";
 import type { Article } from "../types/Article";
 
 type NewArticle = Omit<Article, "id">;
@@ -41,6 +44,8 @@ export function ArticleProvider({
 }: {
   children: ReactNode;
 }) {
+  const { profile, loading: profileLoading } = useProfile();
+
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,21 +53,26 @@ export function ArticleProvider({
     useState<Article | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, COLLECTION_NAME),
-      (snapshot) => {
-        const items = snapshot.docs.map((docSnap) => ({
-          id: docSnap.id,
-          ...(docSnap.data() as Omit<Article, "id">),
-        }));
+    if (profileLoading) {
+      return;
+    }
 
-        setArticles(items);
-        setLoading(false);
-      }
-    );
+    const articlesQuery = profile
+      ? collection(db, COLLECTION_NAME)
+      : query(collection(db, COLLECTION_NAME), where("published", "==", true));
+
+    const unsubscribe = onSnapshot(articlesQuery, (snapshot) => {
+      const items = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...(docSnap.data() as Omit<Article, "id">),
+      }));
+
+      setArticles(items);
+      setLoading(false);
+    });
 
     return unsubscribe;
-  }, []);
+  }, [profile, profileLoading]);
 
   async function addArticle(article: NewArticle) {
     await addDoc(collection(db, COLLECTION_NAME), article);

@@ -1,3 +1,4 @@
+import { SkinDiagnosisProvider } from "./modules/clients/context/SkinDiagnosisContext";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -14,24 +15,28 @@ import { ArticleProvider } from "./modules/articles/context/ArticleContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-
     <AuthProvider>
       <ProfileProvider>
         <RoleProvider>
           <ClientProvider>
             <ProcedureProvider>
               <AppointmentProvider>
+                <SkinDiagnosisProvider>
                 <ArticleProvider>
-
                   <App />
-
                 </ArticleProvider>
+              </SkinDiagnosisProvider>
               </AppointmentProvider>
             </ProcedureProvider>
           </ClientProvider>
         </RoleProvider>
       </ProfileProvider>
     </AuthProvider>
-
   </StrictMode>
 );
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js");
+  });
+}

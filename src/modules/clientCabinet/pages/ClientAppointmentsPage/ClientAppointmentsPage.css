@@ -14,11 +14,33 @@
 
 .client-appointments-item{
     display:flex;
-    flex-direction:column;
-    gap:4px;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
 
     padding:12px 0;
     border-bottom:1px solid rgba(255,255,255,.35);
+}
+
+.client-appointments-item > div{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.client-appointments-item__cancel{
+    flex-shrink:0;
+
+    padding:8px 14px;
+
+    border:1px solid rgba(224,163,163,.45);
+    border-radius:14px;
+
+    background:rgba(224,163,163,.2);
+    color:var(--color-text);
+
+    font-size:13px;
+    cursor:pointer;
 }
 
 .client-appointments-item__date{

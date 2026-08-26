@@ -24,6 +24,52 @@ import {
 import { deleteApp } from "firebase/app";
 
 import { db, createSecondaryApp } from "../../../firebase/config";
+import { useProfile } from "../../auth/context/ProfileContext";
+
+export type SkinDiagnosis = {
+  visual: {
+    blackheads: boolean;
+    openComedones: boolean;
+    milia: boolean;
+    rosacea: boolean;
+    hyperemia: boolean;
+    damagedCapillaries: boolean;
+    largePores: boolean;
+    acneScars: boolean;
+    ageSpots: boolean;
+    nevi: boolean;
+    papules: boolean;
+    pustules: boolean;
+    cysticAcne: boolean;
+    dryness: boolean;
+    dehydration: boolean;
+    fineLines: boolean;
+    freckles: boolean;
+    hyperpigmentation: boolean;
+    mimicWrinkles: boolean;
+  };
+
+  wrinkles: {
+    fine: string;
+    deep: string;
+  };
+
+  skinType:
+    | "normal"
+    | "dry"
+    | "oily"
+    | "combination"
+    | "sensitive"
+    | "";
+
+  tone: "excellent" | "good" | "reduced" | "poor" | "";
+
+  hydration: "low" | "medium" | "high" | "";
+
+  circulation: "reduced" | "medium" | "good" | "";
+
+  phototype: "I" | "II" | "III" | "IV" | "V" | "";
+};
 
 export type Client = {
   id: string;
@@ -38,6 +84,9 @@ export type Client = {
   contraindications: string;
   skin: string;
 
+    // Диагностика кожи
+  skinDiagnosis?: SkinDiagnosis;
+
   // История
   lastVisit: string;
 
@@ -47,6 +96,10 @@ export type Client = {
 
   // Связь с логином клиента в Firebase Auth (если создан)
   authUid?: string;
+
+  // Telegram
+telegramChatId?: string;
+telegramConnected?: boolean;
 };
 
 type NewClient = Omit<Client, "id">;
@@ -75,11 +128,23 @@ type ClientProviderProps = {
 const COLLECTION_NAME = "clients";
 
 export function ClientProvider({ children }: ClientProviderProps) {
+  const { profile, loading: profileLoading } = useProfile();
+
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
   useEffect(() => {
+    if (profileLoading) {
+      return;
+    }
+
+    if (!profile) {
+      setClients([]);
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onSnapshot(
       collection(db, COLLECTION_NAME),
       (snapshot) => {
@@ -94,7 +159,7 @@ export function ClientProvider({ children }: ClientProviderProps) {
     );
 
     return unsubscribe;
-  }, []);
+  }, [profile, profileLoading]);
 
   async function addClient(client: NewClient) {
     const docRef = await addDoc(collection(db, COLLECTION_NAME), client);

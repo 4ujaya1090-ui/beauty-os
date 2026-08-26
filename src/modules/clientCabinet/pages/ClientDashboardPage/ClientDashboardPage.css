@@ -23,6 +23,20 @@
     color:var(--color-text-light);
 }
 
+.client-dashboard__book{
+    padding:14px 18px;
+
+    border:none;
+    border-radius:18px;
+
+    background:var(--color-primary);
+    color:white;
+
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+
 .client-dashboard__logout{
     flex-shrink:0;
 
@@ -113,4 +127,34 @@
 .client-dashboard__article span{
     color:var(--color-text-light);
     font-size:13px;
+}
+.client-dashboard__telegram {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.client-dashboard__telegram-label {
+  margin: 0;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.client-dashboard__telegram-button {
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.45);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.client-dashboard__telegram-button:disabled {
+  cursor: default;
+  opacity: 0.75;
 }

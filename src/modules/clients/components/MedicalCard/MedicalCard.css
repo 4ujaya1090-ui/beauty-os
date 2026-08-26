@@ -1,15 +1,372 @@
-.medical-title{
-
-    font-size:24px;
-
-    margin-bottom:24px;
+.medical-title {
+  font-size: 24px;
+  margin-bottom: 24px;
 }
 
-.medical-content{
+.medical-content {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
 
-    display:flex;
+/* Диагностика */
 
-    flex-direction:column;
+.diagnosis {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 
-    gap:22px;
+  margin-top: 8px;
+  padding-top: 28px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.diagnosis__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.diagnosis__header h3 {
+  margin: 0;
+
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.diagnosis__header p {
+  margin: 0;
+
+  color: var(--color-text-light);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.diagnosis__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.diagnosis__section h4 {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Чекбоксы */
+
+.diagnosis__checks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.diagnosis__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-height: 42px;
+  padding: 9px 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.18);
+
+  color: var(--color-text-light);
+  font-size: 14px;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.diagnosis__check:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.diagnosis__check input {
+  width: 16px;
+  height: 16px;
+
+  margin: 0;
+
+  accent-color: var(--color-primary);
+}
+
+/* Тип кожи */
+
+.diagnosis__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.diagnosis__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.18);
+
+  color: var(--color-text-light);
+  font-size: 14px;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.diagnosis__option:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.diagnosis__option input {
+  margin: 0;
+
+  accent-color: var(--color-primary);
+}
+
+/* Поля */
+
+.diagnosis__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Четыре параметра */
+
+.diagnosis__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.diagnosis__grid select {
+  width: 100%;
+  min-height: 44px;
+
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--color-text);
+
+  font-size: 14px;
+
+  outline: none;
+  cursor: pointer;
+}
+
+.diagnosis__grid select:focus {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Телефон */
+
+@media (max-width: 640px) {
+  .diagnosis__checks {
+    grid-template-columns: 1fr;
+  }
+
+  .diagnosis__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .diagnosis__options {
+    flex-direction: column;
+  }
+
+  .diagnosis__option {
+    min-height: 42px;
+  }
+}.diagnosis__hint {
+  margin: 0;
+
+  color: var(--color-text-light);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Компактное резюме диагностики на карточке */
+
+.diagnosis-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-top: 4px;
+  padding-top: 24px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.diagnosis-summary__header h3 {
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.diagnosis-summary__line {
+  margin: 0;
+
+  font-size: 15px;
+}
+
+.diagnosis-summary__line--muted {
+  color: var(--color-text-light);
+  font-size: 14px;
+}
+
+.diagnosis-summary__open {
+  align-self: flex-start;
+  margin-top: 6px;
+
+  padding: 10px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.35);
+  color: var(--color-text);
+
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* История диагностик */
+
+.diagnosis-history {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  margin-top: 4px;
+  padding-top: 28px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.diagnosis-history h3 {
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.diagnosis-history__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.diagnosis-history__item {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.18);
+
+  overflow: hidden;
+}
+
+.diagnosis-history__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 6px;
+}
+
+.diagnosis-history__row-toggle {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 8px 10px;
+
+  border: none;
+  background: transparent;
+
+  text-align: left;
+  cursor: pointer;
+}
+
+.diagnosis-history__delete {
+  flex-shrink: 0;
+
+  width: 32px;
+  height: 32px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 10px;
+
+  background: rgba(224, 163, 163, 0.2);
+  color: var(--color-text-light);
+
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.diagnosis-history__row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.diagnosis-history__row strong {
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.diagnosis-history__row span {
+  color: var(--color-text-light);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.diagnosis-history__chevron {
+  flex-shrink: 0;
+  color: var(--color-text-light);
+}
+
+.diagnosis-history__details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 0 16px 16px;
+
+  color: var(--color-text-light);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.diagnosis-history__details p {
+  margin: 0;
+}
+
+.diagnosis-history__details strong {
+  color: var(--color-text);
+}
+
+@media (max-width: 640px) {
+  .diagnosis-history__row {
+    align-items: flex-start;
+  }
 }
