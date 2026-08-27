@@ -120,19 +120,27 @@ function formatSummaryLine1(diagnosis: SkinDiagnosis) {
     parts.push(`Фототип ${diagnosis.phototype}`);
   }
 
-  return parts.length > 0 ? parts.join(" · ") : "Диагностика ещё не проводилась";
+  return parts.length > 0
+    ? parts.join(" · ")
+    : "Диагностика ещё не проводилась";
 }
 
 function formatSummaryLine2(diagnosis: SkinDiagnosis) {
   const parts: string[] = [];
 
   if (diagnosis.tone) {
-    parts.push(`Тонус: ${TONE_LABELS[diagnosis.tone].toLowerCase()}`);
+    parts.push(
+      `Тонус: ${TONE_LABELS[
+        diagnosis.tone
+      ].toLowerCase()}`
+    );
   }
 
   if (diagnosis.hydration) {
     parts.push(
-      `Влажность: ${HYDRATION_LABELS[diagnosis.hydration].toLowerCase()}`
+      `Влажность: ${HYDRATION_LABELS[
+        diagnosis.hydration
+      ].toLowerCase()}`
     );
   }
 
@@ -140,45 +148,85 @@ function formatSummaryLine2(diagnosis: SkinDiagnosis) {
 }
 
 function formatHistoryDate(isoDate: string) {
-  return new Date(`${isoDate}T00:00:00`).toLocaleDateString("ru-RU", {
+  return new Date(
+    `${isoDate}T00:00:00`
+  ).toLocaleDateString("ru-RU", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
 }
 
-function MedicalCard({ client }: MedicalCardProps) {
+function MedicalCard({
+  client,
+}: MedicalCardProps) {
   const { updateClient } = useClients();
-    const { getClientDiagnoses, addDiagnosis, deleteDiagnosis } = useSkinDiagnoses();
+
+  const {
+    getClientDiagnoses,
+    addDiagnosis,
+    deleteDiagnosis,
+  } = useSkinDiagnoses();
+
   const { profile } = useProfile();
 
-  const diagnosisHistory = getClientDiagnoses(client.id);
+  const diagnosisHistory =
+    getClientDiagnoses(client.id);
 
-  const labels = profile?.medicalCardLabels ?? DEFAULT_MEDICAL_CARD_LABELS;
+  const labels =
+    profile?.medicalCardLabels ??
+    DEFAULT_MEDICAL_CARD_LABELS;
 
-  const [allergies, setAllergies] = useState(client.allergies);
-  const [contraindications, setContraindications] = useState(
+  const [allergies, setAllergies] =
+    useState(client.allergies);
+
+  const [
+    contraindications,
+    setContraindications,
+  ] = useState(
     client.contraindications
   );
-  const [skin, setSkin] = useState(client.skin);
 
-  const [diagnosis, setDiagnosis] = useState<SkinDiagnosis>(
-    client.skinDiagnosis ?? DEFAULT_DIAGNOSIS
-  );
+  const [skin, setSkin] =
+    useState(client.skin);
 
-  const [isDiagnosisOpen, setIsDiagnosisOpen] = useState(false);
-  const [expandedHistoryId, setExpandedHistoryId] = useState<string | null>(
-    null
-  );
+  const [diagnosis, setDiagnosis] =
+    useState<SkinDiagnosis>(
+      client.skinDiagnosis ??
+        DEFAULT_DIAGNOSIS
+    );
+
+  const [
+    isMedicalCardOpen,
+    setIsMedicalCardOpen,
+  ] = useState(false);
+
+  const [
+    isDiagnosisOpen,
+    setIsDiagnosisOpen,
+  ] = useState(false);
+
+  const [
+    expandedHistoryId,
+    setExpandedHistoryId,
+  ] = useState<string | null>(null);
 
   useEffect(() => {
     setAllergies(client.allergies);
-    setContraindications(client.contraindications);
+    setContraindications(
+      client.contraindications
+    );
     setSkin(client.skin);
-    setDiagnosis(client.skinDiagnosis ?? DEFAULT_DIAGNOSIS);
+    setDiagnosis(
+      client.skinDiagnosis ??
+        DEFAULT_DIAGNOSIS
+    );
   }, [client]);
 
-  function updateVisual(key: keyof SkinDiagnosis["visual"], value: boolean) {
+  function updateVisual(
+    key: keyof SkinDiagnosis["visual"],
+    value: boolean
+  ) {
     setDiagnosis((current) => ({
       ...current,
       visual: {
@@ -199,8 +247,14 @@ function MedicalCard({ client }: MedicalCardProps) {
 
       alert("Карта сохранена");
     } catch (error) {
-      console.error("Не удалось сохранить карту:", error);
-      alert("Не получилось сохранить карту. Проверьте интернет-соединение.");
+      console.error(
+        "Не удалось сохранить карту:",
+        error
+      );
+
+      alert(
+        "Не получилось сохранить карту. Проверьте интернет-соединение."
+      );
     }
   }
 
@@ -211,12 +265,20 @@ function MedicalCard({ client }: MedicalCardProps) {
         skinDiagnosis: diagnosis,
       });
 
-      await addDiagnosis(client.id, diagnosis);
+      await addDiagnosis(
+        client.id,
+        diagnosis
+      );
 
       setIsDiagnosisOpen(false);
+
       alert("Диагностика сохранена");
     } catch (error) {
-      console.error("Не удалось сохранить диагностику:", error);
+      console.error(
+        "Не удалось сохранить диагностику:",
+        error
+      );
+
       alert(
         "Не получилось сохранить диагностику. Проверьте интернет-соединение."
       );
@@ -224,193 +286,367 @@ function MedicalCard({ client }: MedicalCardProps) {
   }
 
   function toggleHistoryItem(id: string) {
-    setExpandedHistoryId((current) => (current === id ? null : id));
+    setExpandedHistoryId(
+      (current) =>
+        current === id ? null : id
+    );
   }
-  function handleDeleteDiagnosis(id: string) {
-    if (!window.confirm("Удалить эту запись диагностики?")) {
+
+  function handleDeleteDiagnosis(
+    id: string
+  ) {
+    if (
+      !window.confirm(
+        "Удалить эту запись диагностики?"
+      )
+    ) {
       return;
     }
 
     deleteDiagnosis(id);
   }
+
   return (
     <GlassCard>
-      <h2 className="medical-title">Карта клиента</h2>
+      <button
+        type="button"
+        className="medical-title"
+        onClick={() =>
+          setIsMedicalCardOpen(
+            (current) => !current
+          )
+        }
+        aria-expanded={isMedicalCardOpen}
+      >
+        <span>Карта клиента</span>
 
-      <div className="medical-content">
-        <TextArea
-          label={labels.field1}
-          value={allergies}
-          onChange={setAllergies}
-        />
+        <span
+          className={`medical-title__arrow ${
+            isMedicalCardOpen
+              ? "medical-title__arrow--open"
+              : ""
+          }`}
+        >
+          ▾
+        </span>
+      </button>
 
-        <TextArea
-          label={labels.field2}
-          value={contraindications}
-          onChange={setContraindications}
-        />
+      {isMedicalCardOpen && (
+        <div className="medical-content">
+          <TextArea
+            label={labels.field1}
+            value={allergies}
+            onChange={setAllergies}
+          />
 
-        <TextArea label={labels.field3} value={skin} onChange={setSkin} />
+          <TextArea
+            label={labels.field2}
+            value={contraindications}
+            onChange={
+              setContraindications
+            }
+          />
 
-        <PrimaryButton onClick={handleSaveCard}>
-          Сохранить карту
-        </PrimaryButton>
+          <TextArea
+            label={labels.field3}
+            value={skin}
+            onChange={setSkin}
+          />
 
-        <div className="diagnosis-summary">
-          <div className="diagnosis-summary__header">
-            <h3>Диагностика кожи</h3>
+          <PrimaryButton
+            onClick={handleSaveCard}
+          >
+            Сохранить карту
+          </PrimaryButton>
+
+          <div className="diagnosis-summary">
+            <div className="diagnosis-summary__header">
+              <h3>Диагностика кожи</h3>
+            </div>
+
+            <p className="diagnosis-summary__line">
+              {formatSummaryLine1(
+                diagnosis
+              )}
+            </p>
+
+            {formatSummaryLine2(
+              diagnosis
+            ) && (
+              <p className="diagnosis-summary__line diagnosis-summary__line--muted">
+                {formatSummaryLine2(
+                  diagnosis
+                )}
+              </p>
+            )}
+
+            <button
+              className="diagnosis-summary__open"
+              onClick={() =>
+                setIsDiagnosisOpen(
+                  true
+                )
+              }
+            >
+              Открыть диагностику
+            </button>
           </div>
 
-          <p className="diagnosis-summary__line">
-            {formatSummaryLine1(diagnosis)}
-          </p>
+          {diagnosisHistory.length >
+            0 && (
+            <div className="diagnosis-history">
+              <h3>
+                История диагностик
+              </h3>
 
-          {formatSummaryLine2(diagnosis) && (
-            <p className="diagnosis-summary__line diagnosis-summary__line--muted">
-              {formatSummaryLine2(diagnosis)}
-            </p>
-          )}
+              <div className="diagnosis-history__list">
+                {diagnosisHistory.map(
+                  (record) => {
+                    const isExpanded =
+                      expandedHistoryId ===
+                      record.id;
 
-          <button
-            className="diagnosis-summary__open"
-            onClick={() => setIsDiagnosisOpen(true)}
-          >
-            Открыть диагностику
-          </button>
-        </div>
-
-        {diagnosisHistory.length > 0 && (
-          <div className="diagnosis-history">
-            <h3>История диагностик</h3>
-
-            <div className="diagnosis-history__list">
-              {diagnosisHistory.map((record) => {
-                const isExpanded = expandedHistoryId === record.id;
-
-                return (
-                  <div
-                    className="diagnosis-history__item"
-                    key={record.id}
-                  >
-                                        <div className="diagnosis-history__row">
-                      <button
-                        className="diagnosis-history__row-toggle"
-                        onClick={() => toggleHistoryItem(record.id)}
+                    return (
+                      <div
+                        className="diagnosis-history__item"
+                        key={record.id}
                       >
-                        <div>
-                          <strong>{formatHistoryDate(record.date)}</strong>
+                        <div className="diagnosis-history__row">
+                          <button
+                            className="diagnosis-history__row-toggle"
+                            onClick={() =>
+                              toggleHistoryItem(
+                                record.id
+                              )
+                            }
+                          >
+                            <div>
+                              <strong>
+                                {formatHistoryDate(
+                                  record.date
+                                )}
+                              </strong>
 
-                          <span>{formatSummaryLine1(record.diagnosis)}</span>
+                              <span>
+                                {formatSummaryLine1(
+                                  record.diagnosis
+                                )}
+                              </span>
+                            </div>
+
+                            <span className="diagnosis-history__chevron">
+                              {isExpanded
+                                ? "︿"
+                                : "﹀"}
+                            </span>
+                          </button>
+
+                          <button
+                            className="diagnosis-history__delete"
+                            onClick={() =>
+                              handleDeleteDiagnosis(
+                                record.id
+                              )
+                            }
+                          >
+                            ✕
+                          </button>
                         </div>
 
-                        <span className="diagnosis-history__chevron">
-                          {isExpanded ? "︿" : "﹀"}
-                        </span>
-                      </button>
+                        {isExpanded && (
+                          <div className="diagnosis-history__details">
+                            <p>
+                              <strong>
+                                Визуальная оценка:{" "}
+                              </strong>
 
-                      <button
-                        className="diagnosis-history__delete"
-                        onClick={() => handleDeleteDiagnosis(record.id)}
-                      >
-                        ✕
-                      </button>
-                    </div>
+                              {VISUAL_OPTIONS.filter(
+                                (option) =>
+                                  record
+                                    .diagnosis
+                                    .visual[
+                                    option.key
+                                  ]
+                              )
+                                .map(
+                                  (
+                                    option
+                                  ) =>
+                                    option.label
+                                )
+                                .join(
+                                  ", "
+                                ) ||
+                                "не отмечено"}
+                            </p>
 
-                    {isExpanded && (
-                      <div className="diagnosis-history__details">
-                        <p>
-                          <strong>Визуальная оценка: </strong>
-                          {VISUAL_OPTIONS.filter(
-                            (option) => record.diagnosis.visual[option.key]
-                          )
-                            .map((option) => option.label)
-                            .join(", ") || "не отмечено"}
-                        </p>
+                            {(
+                              record
+                                .diagnosis
+                                .wrinkles
+                                .fine ||
+                              record
+                                .diagnosis
+                                .wrinkles
+                                .deep
+                            ) && (
+                              <p>
+                                <strong>
+                                  Морщины:{" "}
+                                </strong>
 
-                        {(record.diagnosis.wrinkles.fine ||
-                          record.diagnosis.wrinkles.deep) && (
-                          <p>
-                            <strong>Морщины: </strong>
-                            {[
-                              record.diagnosis.wrinkles.fine &&
-                                `мелкие — ${record.diagnosis.wrinkles.fine}`,
-                              record.diagnosis.wrinkles.deep &&
-                                `глубокие — ${record.diagnosis.wrinkles.deep}`,
-                            ]
-                              .filter(Boolean)
-                              .join("; ")}
-                          </p>
+                                {[
+                                  record
+                                    .diagnosis
+                                    .wrinkles
+                                    .fine &&
+                                    `мелкие — ${record.diagnosis.wrinkles.fine}`,
+
+                                  record
+                                    .diagnosis
+                                    .wrinkles
+                                    .deep &&
+                                    `глубокие — ${record.diagnosis.wrinkles.deep}`,
+                                ]
+                                  .filter(Boolean)
+                                  .join(
+                                    "; "
+                                  )}
+                              </p>
+                            )}
+
+                            <p>
+                              <strong>
+                                Тип кожи:{" "}
+                              </strong>
+
+                              {record.diagnosis
+                                .skinType
+                                ? SKIN_TYPE_LABELS[
+                                    record
+                                      .diagnosis
+                                      .skinType
+                                  ]
+                                : "не указан"}
+                            </p>
+
+                            <p>
+                              <strong>
+                                Тонус:{" "}
+                              </strong>
+
+                              {record.diagnosis
+                                .tone
+                                ? TONE_LABELS[
+                                    record
+                                      .diagnosis
+                                      .tone
+                                  ]
+                                : "не указан"}
+                            </p>
+
+                            <p>
+                              <strong>
+                                Влажность:{" "}
+                              </strong>
+
+                              {record.diagnosis
+                                .hydration
+                                ? HYDRATION_LABELS[
+                                    record
+                                      .diagnosis
+                                      .hydration
+                                  ]
+                                : "не указана"}
+                            </p>
+
+                            <p>
+                              <strong>
+                                Циркуляция:{" "}
+                              </strong>
+
+                              {record.diagnosis
+                                .circulation
+                                ? CIRCULATION_LABELS[
+                                    record
+                                      .diagnosis
+                                      .circulation
+                                  ]
+                                : "не указана"}
+                            </p>
+
+                            <p>
+                              <strong>
+                                Фототип:{" "}
+                              </strong>
+
+                              {record.diagnosis
+                                .phototype ||
+                                "не указан"}
+                            </p>
+                          </div>
                         )}
-
-                        <p>
-                          <strong>Тип кожи: </strong>
-                          {record.diagnosis.skinType
-                            ? SKIN_TYPE_LABELS[record.diagnosis.skinType]
-                            : "не указан"}
-                        </p>
-
-                        <p>
-                          <strong>Тонус: </strong>
-                          {record.diagnosis.tone
-                            ? TONE_LABELS[record.diagnosis.tone]
-                            : "не указан"}
-                        </p>
-
-                        <p>
-                          <strong>Влажность: </strong>
-                          {record.diagnosis.hydration
-                            ? HYDRATION_LABELS[record.diagnosis.hydration]
-                            : "не указана"}
-                        </p>
-
-                        <p>
-                          <strong>Циркуляция: </strong>
-                          {record.diagnosis.circulation
-                            ? CIRCULATION_LABELS[record.diagnosis.circulation]
-                            : "не указана"}
-                        </p>
-
-                        <p>
-                          <strong>Фототип: </strong>
-                          {record.diagnosis.phototype || "не указан"}
-                        </p>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                    );
+                  }
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {isDiagnosisOpen && (
         <Modal
           title="Диагностика кожи"
-          onClose={() => setIsDiagnosisOpen(false)}
+          onClose={() =>
+            setIsDiagnosisOpen(
+              false
+            )
+          }
         >
           <div className="diagnosis">
             <p className="diagnosis__hint">
-              Отметьте особенности, которые наблюдаются при осмотре.
+              Отметьте особенности,
+              которые наблюдаются при
+              осмотре.
             </p>
 
             <div className="diagnosis__section">
-              <h4>Визуальная оценка</h4>
+              <h4>
+                Визуальная оценка
+              </h4>
 
               <div className="diagnosis__checks">
-                {VISUAL_OPTIONS.map((option) => (
-                  <label className="diagnosis__check" key={option.key}>
-                    <input
-                      type="checkbox"
-                      checked={diagnosis.visual[option.key]}
-                      onChange={(event) =>
-                        updateVisual(option.key, event.target.checked)
-                      }
-                    />
+                {VISUAL_OPTIONS.map(
+                  (option) => (
+                    <label
+                      className="diagnosis__check"
+                      key={option.key}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={
+                          diagnosis
+                            .visual[
+                            option.key
+                          ]
+                        }
+                        onChange={(event) =>
+                          updateVisual(
+                            option.key,
+                            event.target
+                              .checked
+                          )
+                        }
+                      />
 
-                    <span>{option.label}</span>
-                  </label>
-                ))}
+                      <span>
+                        {option.label}
+                      </span>
+                    </label>
+                  )
+                )}
               </div>
             </div>
 
@@ -420,23 +656,39 @@ function MedicalCard({ client }: MedicalCardProps) {
               <div className="diagnosis__fields">
                 <TextArea
                   label="Мелкие / поверхностные"
-                  value={diagnosis.wrinkles.fine}
+                  value={
+                    diagnosis.wrinkles
+                      .fine
+                  }
                   onChange={(value) =>
-                    setDiagnosis((current) => ({
-                      ...current,
-                      wrinkles: { ...current.wrinkles, fine: value },
-                    }))
+                    setDiagnosis(
+                      (current) => ({
+                        ...current,
+                        wrinkles: {
+                          ...current.wrinkles,
+                          fine: value,
+                        },
+                      })
+                    )
                   }
                 />
 
                 <TextArea
                   label="Глубокие"
-                  value={diagnosis.wrinkles.deep}
+                  value={
+                    diagnosis.wrinkles
+                      .deep
+                  }
                   onChange={(value) =>
-                    setDiagnosis((current) => ({
-                      ...current,
-                      wrinkles: { ...current.wrinkles, deep: value },
-                    }))
+                    setDiagnosis(
+                      (current) => ({
+                        ...current,
+                        wrinkles: {
+                          ...current.wrinkles,
+                          deep: value,
+                        },
+                      })
+                    )
                   }
                 />
               </div>
@@ -448,29 +700,57 @@ function MedicalCard({ client }: MedicalCardProps) {
               <div className="diagnosis__options">
                 {(
                   [
-                    ["normal", "Нормальная"],
-                    ["dry", "Сухая"],
-                    ["oily", "Жирная"],
-                    ["combination", "Комбинированная"],
-                    ["sensitive", "Чувствительная"],
+                    [
+                      "normal",
+                      "Нормальная",
+                    ],
+                    [
+                      "dry",
+                      "Сухая",
+                    ],
+                    [
+                      "oily",
+                      "Жирная",
+                    ],
+                    [
+                      "combination",
+                      "Комбинированная",
+                    ],
+                    [
+                      "sensitive",
+                      "Чувствительная",
+                    ],
                   ] as const
-                ).map(([value, label]) => (
-                  <label className="diagnosis__option" key={value}>
-                    <input
-                      type="radio"
-                      name="skinType"
-                      checked={diagnosis.skinType === value}
-                      onChange={() =>
-                        setDiagnosis((current) => ({
-                          ...current,
-                          skinType: value,
-                        }))
-                      }
-                    />
+                ).map(
+                  ([value, label]) => (
+                    <label
+                      className="diagnosis__option"
+                      key={value}
+                    >
+                      <input
+                        type="radio"
+                        name="skinType"
+                        checked={
+                          diagnosis.skinType ===
+                          value
+                        }
+                        onChange={() =>
+                          setDiagnosis(
+                            (current) => ({
+                              ...current,
+                              skinType:
+                                value,
+                            })
+                          )
+                        }
+                      />
 
-                    <span>{label}</span>
-                  </label>
-                ))}
+                      <span>
+                        {label}
+                      </span>
+                    </label>
+                  )
+                )}
               </div>
             </div>
 
@@ -479,19 +759,34 @@ function MedicalCard({ client }: MedicalCardProps) {
                 <h4>Тонус</h4>
 
                 <select
-                  value={diagnosis.tone}
+                  value={
+                    diagnosis.tone
+                  }
                   onChange={(event) =>
-                    setDiagnosis((current) => ({
-                      ...current,
-                      tone: event.target.value as SkinDiagnosis["tone"],
-                    }))
+                    setDiagnosis(
+                      (current) => ({
+                        ...current,
+                        tone: event.target
+                          .value as SkinDiagnosis["tone"],
+                      })
+                    )
                   }
                 >
-                  <option value="">Не указано</option>
-                  <option value="excellent">Отличный</option>
-                  <option value="good">Хороший</option>
-                  <option value="reduced">Сниженный</option>
-                  <option value="poor">Плохой</option>
+                  <option value="">
+                    Не указано
+                  </option>
+                  <option value="excellent">
+                    Отличный
+                  </option>
+                  <option value="good">
+                    Хороший
+                  </option>
+                  <option value="reduced">
+                    Сниженный
+                  </option>
+                  <option value="poor">
+                    Плохой
+                  </option>
                 </select>
               </div>
 
@@ -499,39 +794,67 @@ function MedicalCard({ client }: MedicalCardProps) {
                 <h4>Влажность</h4>
 
                 <select
-                  value={diagnosis.hydration}
+                  value={
+                    diagnosis.hydration
+                  }
                   onChange={(event) =>
-                    setDiagnosis((current) => ({
-                      ...current,
-                      hydration: event.target
-                        .value as SkinDiagnosis["hydration"],
-                    }))
+                    setDiagnosis(
+                      (current) => ({
+                        ...current,
+                        hydration:
+                          event.target
+                            .value as SkinDiagnosis["hydration"],
+                      })
+                    )
                   }
                 >
-                  <option value="">Не указано</option>
-                  <option value="low">Низкая</option>
-                  <option value="medium">Средняя</option>
-                  <option value="high">Высокая</option>
+                  <option value="">
+                    Не указано
+                  </option>
+                  <option value="low">
+                    Низкая
+                  </option>
+                  <option value="medium">
+                    Средняя
+                  </option>
+                  <option value="high">
+                    Высокая
+                  </option>
                 </select>
               </div>
 
               <div className="diagnosis__section">
-                <h4>Циркуляция</h4>
+                <h4>
+                  Циркуляция
+                </h4>
 
                 <select
-                  value={diagnosis.circulation}
+                  value={
+                    diagnosis.circulation
+                  }
                   onChange={(event) =>
-                    setDiagnosis((current) => ({
-                      ...current,
-                      circulation: event.target
-                        .value as SkinDiagnosis["circulation"],
-                    }))
+                    setDiagnosis(
+                      (current) => ({
+                        ...current,
+                        circulation:
+                          event.target
+                            .value as SkinDiagnosis["circulation"],
+                      })
+                    )
                   }
                 >
-                  <option value="">Не указано</option>
-                  <option value="reduced">Сниженная</option>
-                  <option value="medium">Средняя</option>
-                  <option value="good">Хорошая</option>
+                  <option value="">
+                    Не указано
+                  </option>
+                  <option value="reduced">
+                    Сниженная
+                  </option>
+                  <option value="medium">
+                    Средняя
+                  </option>
+                  <option value="good">
+                    Хорошая
+                  </option>
                 </select>
               </div>
 
@@ -539,26 +862,45 @@ function MedicalCard({ client }: MedicalCardProps) {
                 <h4>Фототип</h4>
 
                 <select
-                  value={diagnosis.phototype}
+                  value={
+                    diagnosis.phototype
+                  }
                   onChange={(event) =>
-                    setDiagnosis((current) => ({
-                      ...current,
-                      phototype: event.target
-                        .value as SkinDiagnosis["phototype"],
-                    }))
+                    setDiagnosis(
+                      (current) => ({
+                        ...current,
+                        phototype:
+                          event.target
+                            .value as SkinDiagnosis["phototype"],
+                      })
+                    )
                   }
                 >
-                  <option value="">Не указан</option>
-                  <option value="I">I</option>
-                  <option value="II">II</option>
-                  <option value="III">III</option>
-                  <option value="IV">IV</option>
-                  <option value="V">V</option>
+                  <option value="">
+                    Не указан
+                  </option>
+                  <option value="I">
+                    I
+                  </option>
+                  <option value="II">
+                    II
+                  </option>
+                  <option value="III">
+                    III
+                  </option>
+                  <option value="IV">
+                    IV
+                  </option>
+                  <option value="V">
+                    V
+                  </option>
                 </select>
               </div>
             </div>
 
-            <PrimaryButton onClick={handleSaveDiagnosis}>
+            <PrimaryButton
+              onClick={handleSaveDiagnosis}
+            >
               Сохранить
             </PrimaryButton>
           </div>
