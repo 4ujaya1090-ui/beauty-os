@@ -18,6 +18,8 @@ import {
   useAppointments,
 } from "../../../appointments/context/AppointmentContext";
 
+import AppointmentPhotos from "../../../appointments/components/AppointmentPhotos/AppointmentPhotos";
+
 import "./ClientProfilePage.css";
 
 const MONTHS = [
@@ -48,8 +50,10 @@ function formatDate(isoDate: string) {
 function ClientProfilePage() {
   const navigate = useNavigate();
 
-  const [isHistoryOpen, setIsHistoryOpen] =
-    useState(false);
+  const [
+    isHistoryOpen,
+    setIsHistoryOpen,
+  ] = useState(false);
 
   const [
     isHistoryFormOpen,
@@ -93,24 +97,25 @@ function ClientProfilePage() {
     setSelectedAppointment,
   } = useAppointments();
 
- if (!selectedClient) {
-  return (
-    <MainLayout>
-      <div className="client-profile">
-        <h2>Клиент не выбран</h2>
-      </div>
-    </MainLayout>
-  );
-}
+  if (!selectedClient) {
+    return (
+      <MainLayout>
+        <div className="client-profile">
+          <h2>Клиент не выбран</h2>
+        </div>
+      </MainLayout>
+    );
+  }
 
-const clientId = selectedClient.id;
+  const clientId =
+    selectedClient.id;
 
-const clientHistory =
+  const clientHistory =
     appointments
       .filter(
         (appointment) =>
           appointment.clientId ===
-          selectedClient.id
+          clientId
       )
       .sort((a, b) =>
         `${b.date}T${b.time ?? "00:00"}`.localeCompare(
@@ -169,25 +174,30 @@ const clientHistory =
     setHistorySaving(true);
 
     try {
-    const historyEntry = {
-  clientId: clientId,
-  procedure: historyProcedure.trim(),
-  duration: Number(historyDuration) || 0,
-  date: historyDate,
-  time: "",
-  source: "history" as const,
-};
+      const historyEntry = {
+        clientId: clientId,
+        procedure:
+          historyProcedure.trim(),
+        duration:
+          Number(historyDuration) || 0,
+        date: historyDate,
+        time: "",
+        source: "history" as const,
+      };
 
-const comment = historyComment.trim();
+      const comment =
+        historyComment.trim();
 
-if (comment) {
-  await addAppointment({
-    ...historyEntry,
-    comment,
-  });
-} else {
-  await addAppointment(historyEntry);
-}
+      if (comment) {
+        await addAppointment({
+          ...historyEntry,
+          comment,
+        });
+      } else {
+        await addAppointment(
+          historyEntry
+        );
+      }
 
       setHistoryDate("");
       setHistoryProcedure("");
@@ -253,7 +263,7 @@ if (comment) {
           🗑 Удалить клиента
         </PrimaryButton>
 
-        <SectionCard title="История процедур">
+        <SectionCard title="">
           <button
             type="button"
             className="client-history__toggle"
@@ -448,12 +458,19 @@ if (comment) {
                               запись
                             </span>
                           )}
+
+                          <AppointmentPhotos
+                            photos={
+                              appointment.photos
+                            }
+                          />
                         </div>
 
                         <div className="client-history__actions">
                           {appointment.source !==
                             "history" && (
                             <button
+                              type="button"
                               className="client-history__icon"
                               onClick={() =>
                                 handleEditAppointment(
@@ -466,6 +483,7 @@ if (comment) {
                           )}
 
                           <button
+                            type="button"
                             className="client-history__icon"
                             onClick={() =>
                               handleDeleteAppointment(

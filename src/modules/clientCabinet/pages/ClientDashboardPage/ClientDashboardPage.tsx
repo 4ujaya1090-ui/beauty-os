@@ -32,7 +32,10 @@ const MONTHS = [
 ];
 
 function formatDate(isoDate: string) {
-  const [year, month, day] = isoDate.split("-").map(Number);
+  const [year, month, day] = isoDate
+    .split("-")
+    .map(Number);
+
   return `${day} ${MONTHS[month - 1]} ${year}`;
 }
 
@@ -44,10 +47,28 @@ function ClientDashboardPage() {
   const { appointments } = useAppointments();
   const { articles, setSelectedArticle } = useArticles();
 
-  const [telegramConnected, setTelegramConnected] = useState(false);
-  const [telegramLoading, setTelegramLoading] = useState(true);
+  const [
+    telegramConnected,
+    setTelegramConnected,
+  ] = useState(false);
 
-  const clientId = clientRecord?.id ?? "";
+  const [
+    telegramLoading,
+    setTelegramLoading,
+  ] = useState(true);
+
+  const [
+    isHistoryOpen,
+    setIsHistoryOpen,
+  ] = useState(false);
+
+  const [
+    isArticlesOpen,
+    setIsArticlesOpen,
+  ] = useState(false);
+
+  const clientId =
+    clientRecord?.id ?? "";
 
   useEffect(() => {
     if (!clientId) {
@@ -61,7 +82,9 @@ function ClientDashboardPage() {
     async function loadTelegramSubscription() {
       try {
         const subscription =
-          await getTelegramSubscription(clientId);
+          await getTelegramSubscription(
+            clientId
+          );
 
         if (!cancelled) {
           setTelegramConnected(
@@ -97,9 +120,11 @@ function ClientDashboardPage() {
 
   async function handleTelegramConnect() {
     try {
-      const telegramUrl = await createTelegramLink(clientId);
+      const telegramUrl =
+        await createTelegramLink(clientId);
 
-      window.location.href = telegramUrl;
+      window.location.href =
+        telegramUrl;
     } catch (error) {
       console.error(
         "Telegram connection error:",
@@ -114,33 +139,67 @@ function ClientDashboardPage() {
 
   const now = new Date();
 
-  const myAppointments = appointments.filter(
-    (a) => a.clientId === clientRecord.id
-  );
-
-  const upcomingAppointments = [...myAppointments]
-    .filter((a) => new Date(`${a.date}T${a.time}`) >= now)
-    .sort(
-      (a, b) =>
-        new Date(`${a.date}T${a.time}`).getTime() -
-        new Date(`${b.date}T${b.time}`).getTime()
+  const myAppointments =
+    appointments.filter(
+      (appointment) =>
+        appointment.clientId ===
+        clientRecord.id
     );
 
-  const nextAppointment = upcomingAppointments[0];
+  const upcomingAppointments =
+    [...myAppointments]
+      .filter(
+        (appointment) =>
+          new Date(
+            `${appointment.date}T${appointment.time}`
+          ) >= now
+      )
+      .sort(
+        (a, b) =>
+          new Date(
+            `${a.date}T${a.time}`
+          ).getTime() -
+          new Date(
+            `${b.date}T${b.time}`
+          ).getTime()
+      );
 
-  const pastAppointments = [...myAppointments]
-    .filter((a) => new Date(`${a.date}T${a.time}`) < now)
-    .sort((a, b) =>
-      `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`)
+  const nextAppointment =
+    upcomingAppointments[0];
+
+  const pastAppointments =
+    [...myAppointments]
+      .filter(
+        (appointment) =>
+          new Date(
+            `${appointment.date}T${appointment.time}`
+          ) < now
+      )
+      .sort((a, b) =>
+        `${b.date}T${b.time}`.localeCompare(
+          `${a.date}T${a.time}`
+        )
+      );
+
+  const publishedArticles =
+    [...articles]
+      .filter(
+        (article) => article.published
+      )
+      .sort((a, b) =>
+        b.createdAt.localeCompare(
+          a.createdAt
+        )
+      )
+      .slice(0, 5);
+
+  function handleOpenArticle(
+    articleId: string
+  ) {
+    const article = articles.find(
+      (item) =>
+        item.id === articleId
     );
-
-  const publishedArticles = [...articles]
-    .filter((a) => a.published)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, 5);
-
-  function handleOpenArticle(articleId: string) {
-    const article = articles.find((a) => a.id === articleId);
 
     if (!article) {
       return;
@@ -156,7 +215,8 @@ function ClientDashboardPage() {
         <div className="client-dashboard__header">
           <div>
             <h1 className="client-dashboard__title">
-              Здравствуйте, {clientRecord.name}
+              Здравствуйте,{" "}
+              {clientRecord.name}
             </h1>
 
             <p className="client-dashboard__subtitle">
@@ -173,27 +233,34 @@ function ClientDashboardPage() {
         </div>
 
         <GlassCard>
-  <div className="client-dashboard__telegram">
-    <p className="client-dashboard__telegram-label">
-      Уведомления с Telegram
-    </p>
+          <div className="client-dashboard__telegram">
+            <p className="client-dashboard__telegram-label">
+              Уведомления с Telegram
+            </p>
 
-    <button
-  className="client-dashboard__telegram-button"
-  onClick={handleTelegramConnect}
-  disabled={telegramLoading || telegramConnected}
->
-  {telegramLoading
-    ? "Проверка..."
-    : telegramConnected
-      ? "Подключён"
-      : "Подключить"}
-</button>
-  </div>
-</GlassCard>
+            <button
+              className="client-dashboard__telegram-button"
+              onClick={
+                handleTelegramConnect
+              }
+              disabled={
+                telegramLoading ||
+                telegramConnected
+              }
+            >
+              {telegramLoading
+                ? "Проверка..."
+                : telegramConnected
+                  ? "Подключён"
+                  : "Подключить"}
+            </button>
+          </div>
+        </GlassCard>
 
         <GlassCard>
-          <p className="client-dashboard__bonus-label">Ваши бонусы</p>
+          <p className="client-dashboard__bonus-label">
+            Ваши бонусы
+          </p>
 
           <h2 className="client-dashboard__bonus-value">
             {clientRecord.bonus}
@@ -202,78 +269,186 @@ function ClientDashboardPage() {
 
         <button
           className="client-dashboard__book"
-          onClick={() => navigate("/my/booking")}
+          onClick={() =>
+            navigate("/my/booking")
+          }
         >
           + Записаться на приём
         </button>
 
         <div
           className="client-dashboard__clickable"
-          onClick={() => navigate("/my/appointments")}
+          onClick={() =>
+            navigate("/my/appointments")
+          }
         >
           <SectionCard title="Мои записи">
             {nextAppointment ? (
               <>
                 <p>
-                  {formatDate(nextAppointment.date)} · {nextAppointment.time}{" "}
-                  — {nextAppointment.procedure}
+                  {formatDate(
+                    nextAppointment.date
+                  )}{" "}
+                  · {nextAppointment.time} —{" "}
+                  {nextAppointment.procedure}
                 </p>
 
-                {upcomingAppointments.length > 1 && (
+                {upcomingAppointments.length >
+                  1 && (
                   <p className="client-dashboard__more">
-                    Ещё {upcomingAppointments.length - 1} запись(ей) →
+                    Ещё{" "}
+                    {upcomingAppointments.length -
+                      1}{" "}
+                    запись(ей) →
                   </p>
                 )}
               </>
             ) : (
-              <p>Пока ничего не запланировано.</p>
+              <p>
+                Пока ничего не
+                запланировано.
+              </p>
             )}
           </SectionCard>
         </div>
 
-        <SectionCard title="История посещений">
-          {pastAppointments.length === 0 ? (
-            <p>История пока пуста.</p>
-          ) : (
-            <div className="client-dashboard__history">
-              {pastAppointments.map((a) => (
-                <div
-                  className="client-dashboard__history-item"
-                  key={a.id}
-                >
-                  <span>
-                    {formatDate(a.date)} · {a.time}
-                  </span>
+        <SectionCard title="">
+          <button
+            type="button"
+            className="client-dashboard__history-toggle"
+            onClick={() =>
+              setIsHistoryOpen(
+                (current) => !current
+              )
+            }
+            aria-expanded={
+              isHistoryOpen
+            }
+          >
+            <span>
+              История посещений
+            </span>
 
-                  <span>{a.procedure}</span>
-                </div>
-              ))}
+            <span
+              className={`client-dashboard__history-arrow ${
+                isHistoryOpen
+                  ? "client-dashboard__history-arrow--open"
+                  : ""
+              }`}
+            >
+              ▾
+            </span>
+          </button>
+
+          {isHistoryOpen && (
+            <div className="client-dashboard__history">
+              {pastAppointments.length ===
+              0 ? (
+                <p>
+                  История пока пуста.
+                </p>
+              ) : (
+                pastAppointments.map(
+                  (appointment) => (
+                    <div
+                      className="client-dashboard__history-item"
+                      key={
+                        appointment.id
+                      }
+                    >
+                      <span>
+                        {formatDate(
+                          appointment.date
+                        )}
+                        {appointment.time
+                          ? ` · ${appointment.time}`
+                          : ""}
+                      </span>
+
+                      <span>
+                        {
+                          appointment.procedure
+                        }
+                      </span>
+                    </div>
+                  )
+                )
+              )}
             </div>
           )}
         </SectionCard>
 
-        <SectionCard title="Статьи специалиста">
-          {publishedArticles.length === 0 ? (
-            <p>Пока нет публикаций.</p>
-          ) : (
-            <div className="client-dashboard__articles">
-              {publishedArticles.map((article) => (
-                <div
-                  key={article.id}
-                  className="client-dashboard__article"
-                  onClick={() => handleOpenArticle(article.id)}
-                >
-                  <strong>{article.title}</strong>
-                  <span>{article.category}</span>
-                </div>
-              ))}
+        <SectionCard title="">
+          <button
+            type="button"
+            className="client-dashboard__history-toggle"
+            onClick={() =>
+              setIsArticlesOpen(
+                (current) => !current
+              )
+            }
+            aria-expanded={
+              isArticlesOpen
+            }
+          >
+            <span>
+              Статьи специалиста
+            </span>
 
-              <button
-                className="client-dashboard__show-all"
-                onClick={() => navigate("/my/articles")}
-              >
-                Показать все →
-              </button>
+            <span
+              className={`client-dashboard__history-arrow ${
+                isArticlesOpen
+                  ? "client-dashboard__history-arrow--open"
+                  : ""
+              }`}
+            >
+              ▾
+            </span>
+          </button>
+
+          {isArticlesOpen && (
+            <div className="client-dashboard__articles">
+              {publishedArticles.length ===
+              0 ? (
+                <p>
+                  Пока нет публикаций.
+                </p>
+              ) : (
+                <>
+                  {publishedArticles.map(
+                    (article) => (
+                      <div
+                        key={article.id}
+                        className="client-dashboard__article"
+                        onClick={() =>
+                          handleOpenArticle(
+                            article.id
+                          )
+                        }
+                      >
+                        <strong>
+                          {article.title}
+                        </strong>
+
+                        <span>
+                          {article.category}
+                        </span>
+                      </div>
+                    )
+                  )}
+
+                  <button
+                    className="client-dashboard__show-all"
+                    onClick={() =>
+                      navigate(
+                        "/my/articles"
+                      )
+                    }
+                  >
+                    Показать все →
+                  </button>
+                </>
+              )}
             </div>
           )}
         </SectionCard>

@@ -12,12 +12,23 @@ import type { Client } from "../../context/ClientContext";
 import "./ClientInfoPanel.css";
 
 const MONTHS = [
-  "января", "февраля", "марта", "апреля", "мая", "июня",
-  "июля", "августа", "сентября", "октября", "ноября", "декабря",
+  "января",
+  "февраля",
+  "марта",
+  "апреля",
+  "мая",
+  "июня",
+  "июля",
+  "августа",
+  "сентября",
+  "октября",
+  "ноября",
+  "декабря",
 ];
 
 function getAge(birthDate: string) {
-  const [day, month, year] = birthDate.split(".");
+  const [day, month, year] =
+    birthDate.split(".");
 
   const birth = new Date(
     Number(year),
@@ -27,13 +38,18 @@ function getAge(birthDate: string) {
 
   const today = new Date();
 
-  let age = today.getFullYear() - birth.getFullYear();
+  let age =
+    today.getFullYear() -
+    birth.getFullYear();
 
-  const monthDiff = today.getMonth() - birth.getMonth();
+  const monthDiff =
+    today.getMonth() -
+    birth.getMonth();
 
   if (
     monthDiff < 0 ||
-    (monthDiff === 0 && today.getDate() < birth.getDate())
+    (monthDiff === 0 &&
+      today.getDate() < birth.getDate())
   ) {
     age--;
   }
@@ -41,9 +57,20 @@ function getAge(birthDate: string) {
   return age;
 }
 
-function formatNextAppointment(isoDate: string, time: string) {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  return `${day} ${MONTHS[month - 1]} ${year} • ${time}`;
+function formatDate(isoDate: string) {
+  const [year, month, day] =
+    isoDate.split("-").map(Number);
+
+  return `${day} ${MONTHS[month - 1]} ${year}`;
+}
+
+function formatNextAppointment(
+  isoDate: string,
+  time: string
+) {
+  return `${formatDate(
+    isoDate
+  )} • ${time}`;
 }
 
 type ClientInfoPanelProps = {
@@ -56,49 +83,95 @@ function ClientInfoPanel({
   const navigate = useNavigate();
 
   const { updateClient } = useClients();
-  const { appointments } = useAppointments();
+  const { appointments } =
+    useAppointments();
 
-  const [bonusAmount, setBonusAmount] = useState("");
+  const [bonusAmount, setBonusAmount] =
+    useState("");
 
   const now = new Date();
 
-  const nextAppointment = appointments
-    .filter(
+  const clientAppointments =
+    appointments.filter(
       (appointment) =>
-        appointment.clientId === client.id &&
-        new Date(`${appointment.date}T${appointment.time}`) >= now
-    )
-    .sort(
-      (a, b) =>
-        new Date(`${a.date}T${a.time}`).getTime() -
-        new Date(`${b.date}T${b.time}`).getTime()
-    )[0];
+        appointment.clientId ===
+        client.id
+    );
 
-  function handleBonusChange(sign: 1 | -1) {
-    const amount = Number(bonusAmount);
+  const nextAppointment =
+    [...clientAppointments]
+      .filter(
+        (appointment) =>
+          appointment.time &&
+          new Date(
+            `${appointment.date}T${appointment.time}`
+          ) >= now
+      )
+      .sort(
+        (a, b) =>
+          new Date(
+            `${a.date}T${a.time}`
+          ).getTime() -
+          new Date(
+            `${b.date}T${b.time}`
+          ).getTime()
+      )[0];
+
+  const lastAppointment =
+    [...clientAppointments]
+      .filter(
+        (appointment) =>
+          new Date(
+            `${appointment.date}T${
+              appointment.time || "00:00"
+            }`
+          ) < now
+      )
+      .sort(
+        (a, b) =>
+          new Date(
+            `${b.date}T${
+              b.time || "00:00"
+            }`
+          ).getTime() -
+          new Date(
+            `${a.date}T${
+              a.time || "00:00"
+            }`
+          ).getTime()
+      )[0];
+
+  function handleBonusChange(
+    sign: 1 | -1
+  ) {
+    const amount =
+      Number(bonusAmount);
 
     if (!amount || amount <= 0) {
-      window.alert("Введите сумму бонусов");
+      window.alert(
+        "Введите сумму бонусов"
+      );
       return;
     }
 
-    const newBonus = Math.max(0, client.bonus + sign * amount);
+    const newBonus = Math.max(
+      0,
+      client.bonus +
+        sign * amount
+    );
 
-    updateClient({ ...client, bonus: newBonus });
+    updateClient({
+      ...client,
+      bonus: newBonus,
+    });
+
     setBonusAmount("");
   }
 
   return (
     <GlassCard>
       <div className="client-info">
-        <div className="client-avatar">
-          <img
-            src={client.photo}
-            alt={client.name}
-            className="client-avatar__image"
-          />
-        </div>
-
+       
         <h2 className="client-name">
           {client.name}
         </h2>
@@ -114,12 +187,21 @@ function ClientInfoPanel({
         <div className="client-stats">
           <div className="client-stat">
             <span>Возраст</span>
-            <strong>{getAge(client.birthDate)} лет</strong>
+
+            <strong>
+              {getAge(
+                client.birthDate
+              )}{" "}
+              лет
+            </strong>
           </div>
 
           <div className="client-stat">
             <span>Бонусы</span>
-            <strong>{client.bonus}</strong>
+
+            <strong>
+              {client.bonus}
+            </strong>
           </div>
         </div>
 
@@ -129,40 +211,75 @@ function ClientInfoPanel({
             className="bonus-editor__input"
             placeholder="Сумма"
             value={bonusAmount}
-            onChange={(e) => setBonusAmount(e.target.value)}
+            onChange={(event) =>
+              setBonusAmount(
+                event.target.value
+              )
+            }
           />
 
           <button
             className="bonus-editor__button bonus-editor__button--add"
-            onClick={() => handleBonusChange(1)}
+            onClick={() =>
+              handleBonusChange(1)
+            }
           >
             + Начислить
           </button>
 
           <button
             className="bonus-editor__button bonus-editor__button--remove"
-            onClick={() => handleBonusChange(-1)}
+            onClick={() =>
+              handleBonusChange(-1)
+            }
           >
             − Списать
           </button>
         </div>
 
         <div className="client-last">
-          <span>Последняя процедура</span>
-          <strong>{client.lastVisit}</strong>
+          <span>
+            Последняя процедура
+          </span>
+
+          <strong>
+            {lastAppointment
+              ? `${formatDate(
+                  lastAppointment.date
+                )}${
+                  lastAppointment.time
+                    ? ` · ${lastAppointment.time}`
+                    : ""
+                }`
+              : client.lastVisit || "Не проводилась"}
+          </strong>
+
+          {lastAppointment && (
+            <span>
+              {lastAppointment.procedure}
+            </span>
+          )}
         </div>
 
         <div className="client-next">
-          <span>Следующая запись</span>
+          <span>
+            Следующая запись
+          </span>
+
           <strong>
             {nextAppointment
-              ? formatNextAppointment(nextAppointment.date, nextAppointment.time)
+              ? formatNextAppointment(
+                  nextAppointment.date,
+                  nextAppointment.time
+                )
               : "Не назначена"}
           </strong>
         </div>
 
         <PrimaryButton
-          onClick={() => navigate("/edit-client")}
+          onClick={() =>
+            navigate("/edit-client")
+          }
         >
           ✏️ Редактировать клиента
         </PrimaryButton>
