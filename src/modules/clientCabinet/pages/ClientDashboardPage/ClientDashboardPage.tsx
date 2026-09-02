@@ -7,7 +7,10 @@ import GlassCard from "../../../shared/components/GlassCard/GlassCard";
 import SectionCard from "../../../shared/components/SectionCard/SectionCard";
 
 import { createTelegramLink } from "../../../clients/services/telegramService";
-import { getTelegramSubscription } from "../../../clients/services/telegramSubscriptionService";
+import {
+  disconnectTelegram,
+  getTelegramSubscription,
+} from "../../../clients/services/telegramSubscriptionService";
 
 import { useAuth } from "../../../auth/context/AuthContext";
 import { useRole } from "../../../auth/context/RoleContext";
@@ -120,6 +123,8 @@ function ClientDashboardPage() {
 
   async function handleTelegramConnect() {
     try {
+      setTelegramLoading(true);
+
       const telegramUrl =
         await createTelegramLink(clientId);
 
@@ -131,9 +136,40 @@ function ClientDashboardPage() {
         error
       );
 
+      setTelegramLoading(false);
+
       alert(
         "Не удалось подготовить подключение Telegram."
       );
+    }
+  }
+
+  async function handleTelegramDisconnect() {
+    const confirmed = window.confirm(
+      "Отключить уведомления Telegram?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setTelegramLoading(true);
+
+      await disconnectTelegram(clientId);
+
+      setTelegramConnected(false);
+    } catch (error) {
+      console.error(
+        "Telegram disconnection error:",
+        error
+      );
+
+      alert(
+        "Не удалось отключить Telegram."
+      );
+    } finally {
+      setTelegramLoading(false);
     }
   }
 
@@ -241,17 +277,16 @@ function ClientDashboardPage() {
             <button
               className="client-dashboard__telegram-button"
               onClick={
-                handleTelegramConnect
-              }
-              disabled={
-                telegramLoading ||
                 telegramConnected
+                  ? handleTelegramDisconnect
+                  : handleTelegramConnect
               }
+              disabled={telegramLoading}
             >
               {telegramLoading
                 ? "Проверка..."
                 : telegramConnected
-                  ? "Подключён"
+                  ? "Отключить"
                   : "Подключить"}
             </button>
           </div>
