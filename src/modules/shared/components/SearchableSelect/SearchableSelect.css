@@ -1,0 +1,282 @@
+.searchable-select {
+  position: relative;
+  width: 100%;
+}
+
+.searchable-select__control {
+  width: 100%;
+  min-height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 16px 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  outline: none;
+
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.42);
+
+  color: var(--color-text);
+
+  font-size: 16px;
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
+}
+
+.searchable-select__control:hover {
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.searchable-select--open
+  .searchable-select__control {
+  border-color: var(--color-primary);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(205, 183, 167, 0.18);
+}
+
+.searchable-select--disabled
+  .searchable-select__control {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.searchable-select__value {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchable-select__placeholder {
+  color: var(--color-text-light);
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchable-select__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  flex-shrink: 0;
+}
+
+.searchable-select__clear {
+  width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.55);
+
+  color: var(--color-text-light);
+
+  font-size: 18px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.searchable-select__clear:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.searchable-select__arrow {
+  flex-shrink: 0;
+
+  font-size: 14px;
+
+  color: var(--color-text-light);
+
+  transition: transform 0.2s;
+}
+
+.searchable-select--open
+  .searchable-select__arrow {
+  transform: rotate(180deg);
+}
+
+.searchable-select__dropdown {
+  position: absolute;
+
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+
+  z-index: 1000;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.6);
+
+  border-radius: 18px;
+
+  background:
+    rgba(255, 252, 248, 0.94);
+
+  box-shadow:
+    0 16px 40px
+    rgba(65, 48, 35, 0.16);
+
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.searchable-select__search {
+  padding: 10px;
+  border-bottom:
+    1px solid
+    rgba(120, 100, 85, 0.12);
+}
+
+.searchable-select__search input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  border:
+    1px solid
+    rgba(120, 100, 85, 0.16);
+
+  border-radius: 12px;
+
+  outline: none;
+
+  background:
+    rgba(255, 255, 255, 0.72);
+
+  color: var(--color-text);
+
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.searchable-select__search input:focus {
+  border-color: var(--color-primary);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(205, 183, 167, 0.14);
+}
+
+.searchable-select__options {
+  max-height: 280px;
+
+  overflow-y: auto;
+
+  padding: 6px;
+}
+
+.searchable-select__option {
+  width: 100%;
+
+  display: block;
+
+  padding: 11px 12px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  font-size: 14px;
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.searchable-select__option:hover {
+  background:
+    rgba(205, 183, 167, 0.18);
+}
+
+.searchable-select__option--selected {
+  background:
+    rgba(205, 183, 167, 0.24);
+
+  font-weight: 600;
+}
+
+.searchable-select__empty {
+  padding: 20px 12px;
+
+  color: var(--color-text-light);
+
+  font-size: 14px;
+
+  text-align: center;
+}.searchable-select__special-option {
+  width: 100%;
+
+  display: block;
+
+  margin-top: 4px;
+  padding: 12px;
+
+  border: none;
+  border-top:
+    1px solid
+    rgba(120, 100, 85, 0.12);
+  border-radius: 0 0 10px 10px;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 600;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.searchable-select__special-option:hover {
+  background:
+    rgba(205, 183, 167, 0.18);
+}

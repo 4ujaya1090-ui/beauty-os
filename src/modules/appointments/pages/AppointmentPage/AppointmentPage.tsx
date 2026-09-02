@@ -7,6 +7,9 @@ import SectionCard from "../../../shared/components/SectionCard/SectionCard";
 import TextField from "../../../shared/components/TextField/TextField";
 import TextArea from "../../../shared/components/TextArea/TextArea";
 import PrimaryButton from "../../../shared/components/PrimaryButton/PrimaryButton";
+import SearchableSelect, {
+  type SearchableSelectOption,
+} from "../../../shared/components/SearchableSelect/SearchableSelect";
 
 import { useProcedures } from "../../../procedures/context/ProcedureContext";
 
@@ -85,6 +88,7 @@ function AppointmentPage() {
     if (matchingProcedure) {
       setProcedureId(matchingProcedure.id);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAppointment]);
 
@@ -95,9 +99,25 @@ function AppointmentPage() {
   }, []);
 
   const isNewClient = clientId === NEW_CLIENT_OPTION;
+
   const selectedProcedure = procedures.find(
     (procedure) => procedure.id === procedureId
   );
+
+  const clientOptions: SearchableSelectOption[] = clients.map(
+  (client) => ({
+    value: client.id,
+    label: `${client.name} · ${client.phone}`,
+    searchText: `${client.name} ${client.phone}`,
+  })
+);
+
+  const procedureOptions: SearchableSelectOption[] =
+    procedures.map((procedure) => ({
+      value: procedure.id,
+      label: `${procedure.name} · ${procedure.duration} мин`,
+      searchText: procedure.name,
+    }));
 
   async function handleSave() {
     if (isSaving) {
@@ -133,8 +153,11 @@ function AppointmentPage() {
       const conflictClient = clients.find((c) => c.id === conflict.clientId);
 
       window.alert(
-        `На это время уже есть запись: ${conflictClient?.name ?? "клиент"} — ${conflict.procedure} (${conflict.time})`
+        `На это время уже есть запись: ${
+          conflictClient?.name ?? "клиент"
+        } — ${conflict.procedure} (${conflict.time})`
       );
+
       return;
     }
 
@@ -206,6 +229,7 @@ function AppointmentPage() {
         window.alert(
           "Сохранение затянулось дольше обычного. Возможно, запись всё же прошла — сейчас открою календарь, проверьте, появилась ли она."
         );
+
         navigate("/calendar");
       } else {
         window.alert(
@@ -220,30 +244,29 @@ function AppointmentPage() {
   return (
     <MainLayout>
       <div className="appointment-page">
-        <SectionCard title={isEditing ? "Редактирование записи" : "Основная информация"}>
+        <SectionCard
+          title={
+            isEditing
+              ? "Редактирование записи"
+              : "Основная информация"
+          }
+        >
           <div className="appointment-field">
-            <label className="appointment-field__label">Клиент</label>
+            <label className="appointment-field__label">
+              Клиент
+            </label>
 
-            <select
-              className="appointment-field__select"
-              value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
-              disabled={isEditing}
-            >
-              <option value="" disabled>
-                Выберите клиента
-              </option>
-
-              {clients.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.name} · {client.phone}
-                </option>
-              ))}
-
-              {!isEditing && (
-                <option value={NEW_CLIENT_OPTION}>+ Новый клиент</option>
-              )}
-            </select>
+           <SearchableSelect
+  options={clientOptions}
+  value={clientId}
+  onChange={setClientId}
+  placeholder="Выберите клиента"
+  searchPlaceholder="Поиск клиента..."
+  emptyText="Клиент не найден"
+  specialOptionLabel="+ Новый клиент"
+  specialOptionValue={NEW_CLIENT_OPTION}
+  disabled={isEditing}
+/>
           </div>
 
           {isNewClient && (
@@ -263,23 +286,18 @@ function AppointmentPage() {
           )}
 
           <div className="appointment-field">
-            <label className="appointment-field__label">Процедура</label>
+            <label className="appointment-field__label">
+              Процедура
+            </label>
 
-            <select
-              className="appointment-field__select"
+            <SearchableSelect
+              options={procedureOptions}
               value={procedureId}
-              onChange={(e) => setProcedureId(e.target.value)}
-            >
-              <option value="" disabled>
-                Выберите процедуру
-              </option>
-
-              {procedures.map((procedure) => (
-                <option key={procedure.id} value={procedure.id}>
-                  {procedure.name} · {procedure.duration} мин
-                </option>
-              ))}
-            </select>
+              onChange={setProcedureId}
+              placeholder="Выберите процедуру"
+              searchPlaceholder="Поиск процедуры..."
+              emptyText="Процедура не найдена"
+            />
           </div>
 
           <TextField
@@ -306,8 +324,15 @@ function AppointmentPage() {
           />
         </SectionCard>
 
-        <PrimaryButton onClick={handleSave} disabled={isSaving}>
-          {isSaving ? "Сохраняем..." : isEditing ? "Сохранить изменения" : "Сохранить запись"}
+        <PrimaryButton
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          {isSaving
+            ? "Сохраняем..."
+            : isEditing
+              ? "Сохранить изменения"
+              : "Сохранить запись"}
         </PrimaryButton>
       </div>
     </MainLayout>

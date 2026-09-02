@@ -35,13 +35,26 @@ function ClientAppointmentsPage() {
         new Date(`${b.date}T${b.time}`).getTime()
     );
 
-  function handleCancel(appointmentId: string) {
-    if (!window.confirm("Отменить эту запись?")) {
-      return;
-    }
-
-    deleteAppointment(appointmentId);
+  async function handleCancel(
+  appointmentId: string
+) {
+  if (!window.confirm("Отменить эту запись?")) {
+    return;
   }
+
+  try {
+    await deleteAppointment(appointmentId);
+  } catch (error) {
+    console.error(
+      "Не удалось отменить запись:",
+      error
+    );
+
+    window.alert(
+      "Не удалось отменить запись. Возможно, нет доступа или произошла ошибка соединения."
+    );
+  }
+}
 
   return (
     <MainLayout>
