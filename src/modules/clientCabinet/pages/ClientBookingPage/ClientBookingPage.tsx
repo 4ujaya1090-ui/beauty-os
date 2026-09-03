@@ -202,7 +202,7 @@ function ClientBookingPage() {
             daySchedule &&
             !daySchedule.enabled && (
               <p className="client-booking__hint">
-                В этот день специалист не работает.
+                В этот день нет свободных окон.
               </p>
             )}
 

@@ -1,4 +1,8 @@
-import { doc, getDoc } from "firebase/firestore";
+import {
+  deleteDoc,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 
 import { db } from "../../../firebase/config";
 
@@ -28,4 +32,16 @@ export async function getTelegramSubscription(
     chatId: String(data.chatId ?? ""),
     connected: data.connected === true,
   };
+}
+
+export async function disconnectTelegram(
+  clientId: string
+): Promise<void> {
+  const subscriptionRef = doc(
+    db,
+    "telegramSubscriptions",
+    clientId
+  );
+
+  await deleteDoc(subscriptionRef);
 }

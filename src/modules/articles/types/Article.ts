@@ -1,19 +1,25 @@
 export type Article = {
-    id: string;
+  id: string;
 
-    specialistId: string;
+  specialistId: string;
 
-    title: string;
+  title: string;
 
-    content: string;
+  content: string;
 
-    category: string;
+  category: string;
 
-    image?: string;
+  image?: string;
 
-    createdAt: string;
+  createdAt: string;
 
-    updatedAt: string;
+  updatedAt: string;
 
-    published: boolean;
+  published: boolean;
+
+  source?: "beauty-os" | "telegram";
+
+  telegramChatId?: string;
+
+  telegramMessageId?: number;
 };

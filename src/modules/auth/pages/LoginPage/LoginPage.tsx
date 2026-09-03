@@ -40,8 +40,7 @@ function LoginPage() {
       <GlassCard>
         <div className="login-card">
           <h1 className="login-title">Beauty OS</h1>
-          <p className="login-subtitle">Вход для косметолога</p>
-
+          
           <TextField
             label="Email"
             type="email"
