@@ -5,14 +5,19 @@ import { useArticles } from "../../../articles/context/ArticleContext";
 
 import "./ClientArticlePage.css";
 
-const MONTHS = [
-  "января", "февраля", "марта", "апреля", "мая", "июня",
-  "июля", "августа", "сентября", "октября", "ноября", "декабря",
-];
-
 function formatDate(isoDate: string) {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  return `${day} ${MONTHS[month - 1]} ${year}`;
+  const date = new Date(isoDate);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Дата не указана";
+  }
+
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Tashkent",
+  }).format(date);
 }
 
 function ClientArticlePage() {
@@ -44,9 +49,27 @@ function ClientArticlePage() {
             />
           )}
 
-          <p className="client-article-page__content">
-            {selectedArticle.content}
-          </p>
+          <p
+  className="client-article-page__content"
+  style={{ whiteSpace: "pre-line" }}
+>
+  {selectedArticle.content
+    .split(/(https:\/\/t\.me\/skinimalismuz)/g)
+    .map((part, index) =>
+      part === "https://t.me/skinimalismuz" ? (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {part}
+        </a>
+      ) : (
+        part
+      )
+    )}
+</p>
         </SectionCard>
       </div>
     </MainLayout>
