@@ -7,6 +7,11 @@ import {
 } from "react";
 
 import {
+  getAuth,
+  getIdToken,
+} from "firebase/auth";
+
+import {
   collection,
   onSnapshot,
   addDoc,
@@ -38,6 +43,9 @@ export type Appointment = {
   photos?: string[];
 
   source?: "booking" | "history";
+
+  createdByUid?: string;
+  specialistNotificationSent?: boolean;
 };
 
 type NewAppointment = Omit<Appointment, "id">;
@@ -46,26 +54,33 @@ type AppointmentContextType = {
   appointments: Appointment[];
   loading: boolean;
   selectedAppointment: Appointment | null;
+
   setSelectedAppointment: (
     appointment: Appointment | null
   ) => void;
+
   addAppointment: (
     appointment: NewAppointment
   ) => Promise<void>;
+
   updateAppointment: (
     appointment: Appointment
   ) => Promise<void>;
+
   deleteAppointment: (
     id: string
   ) => Promise<void>;
+
   addPhoto: (
     appointmentId: string,
     url: string
   ) => Promise<void>;
+
   removePhoto: (
     appointmentId: string,
     url: string
   ) => Promise<void>;
+
   getConflict: (
     candidate: {
       date: string;
@@ -87,7 +102,8 @@ type AppointmentProviderProps = {
 const COLLECTION_NAME = "appointments";
 
 function toMinutes(time: string) {
-  const [hours, minutes] = time.split(":").map(Number);
+  const [hours, minutes] =
+    time.split(":").map(Number);
 
   return hours * 60 + minutes;
 }
@@ -95,8 +111,10 @@ function toMinutes(time: string) {
 export function AppointmentProvider({
   children,
 }: AppointmentProviderProps) {
-  const { profile, loading: profileLoading } =
-    useProfile();
+  const {
+    profile,
+    loading: profileLoading,
+  } = useProfile();
 
   const {
     clientRecord,
@@ -115,50 +133,72 @@ export function AppointmentProvider({
   ] = useState<Appointment | null>(null);
 
   useEffect(() => {
-    if (profileLoading || roleLoading) {
+    if (
+      profileLoading ||
+      roleLoading
+    ) {
       setLoading(true);
       return;
     }
 
-    // Специалист:
-    // профиль существует, клиентской записи нет.
-    if (profile && !clientRecord) {
-      const unsubscribe = onSnapshot(
-        collection(db, COLLECTION_NAME),
-        (snapshot) => {
-          const items = snapshot.docs.map(
-            (docSnap) => ({
-              id: docSnap.id,
-              ...(docSnap.data() as Omit<
-                Appointment,
-                "id"
-              >),
-            })
-          );
+    /*
+     * ============================================================
+     * SPECIALIST
+     * ============================================================
+     */
 
-          setAppointments(items);
-          setLoading(false);
-        },
-        (error) => {
-          console.error(
-            "Appointments listener error:",
-            error
-          );
+    if (
+      profile &&
+      !clientRecord
+    ) {
+      const unsubscribe =
+        onSnapshot(
+          collection(
+            db,
+            COLLECTION_NAME
+          ),
+          (snapshot) => {
+            const items =
+              snapshot.docs.map(
+                (docSnap) => ({
+                  id: docSnap.id,
+                  ...(docSnap.data() as Omit<
+                    Appointment,
+                    "id"
+                  >),
+                })
+              );
 
-          setAppointments([]);
-          setLoading(false);
-        }
-      );
+            setAppointments(items);
+            setLoading(false);
+          },
+          (error) => {
+            console.error(
+              "Appointments listener error:",
+              error
+            );
+
+            setAppointments([]);
+            setLoading(false);
+          }
+        );
 
       return unsubscribe;
     }
 
-    // Клиент:
-    // читаем только его собственные записи.
+    /*
+     * ============================================================
+     * CLIENT
+     * ============================================================
+     */
+
     if (clientRecord) {
       const clientAppointmentsQuery =
         query(
-          collection(db, COLLECTION_NAME),
+          collection(
+            db,
+            COLLECTION_NAME
+          ),
           where(
             "clientId",
             "==",
@@ -166,37 +206,44 @@ export function AppointmentProvider({
           )
         );
 
-      const unsubscribe = onSnapshot(
-        clientAppointmentsQuery,
-        (snapshot) => {
-          const items = snapshot.docs.map(
-            (docSnap) => ({
-              id: docSnap.id,
-              ...(docSnap.data() as Omit<
-                Appointment,
-                "id"
-              >),
-            })
-          );
+      const unsubscribe =
+        onSnapshot(
+          clientAppointmentsQuery,
+          (snapshot) => {
+            const items =
+              snapshot.docs.map(
+                (docSnap) => ({
+                  id: docSnap.id,
+                  ...(docSnap.data() as Omit<
+                    Appointment,
+                    "id"
+                  >),
+                })
+              );
 
-          setAppointments(items);
-          setLoading(false);
-        },
-        (error) => {
-          console.error(
-            "Client appointments listener error:",
-            error
-          );
+            setAppointments(items);
+            setLoading(false);
+          },
+          (error) => {
+            console.error(
+              "Client appointments listener error:",
+              error
+            );
 
-          setAppointments([]);
-          setLoading(false);
-        }
-      );
+            setAppointments([]);
+            setLoading(false);
+          }
+        );
 
       return unsubscribe;
     }
 
-    // Посторонний аккаунт.
+    /*
+     * ============================================================
+     * UNKNOWN ACCOUNT
+     * ============================================================
+     */
+
     setAppointments([]);
     setLoading(false);
 
@@ -208,14 +255,152 @@ export function AppointmentProvider({
     roleLoading,
   ]);
 
+  /*
+   * ============================================================
+   * ADD APPOINTMENT
+   * ============================================================
+   */
+
   async function addAppointment(
     appointment: NewAppointment
   ) {
-    await addDoc(
-      collection(db, COLLECTION_NAME),
-      appointment
-    );
+    const auth = getAuth();
+    const currentUser =
+      auth.currentUser;
+
+    /*
+     * Клиент создаёт обычную запись.
+     *
+     * Даже если страница бронирования не передала
+     * source, мы сами считаем её booking.
+     *
+     * История source === "history" не трогаем.
+     */
+
+    const isClientBooking =
+      currentUser !== null &&
+      clientRecord !== null &&
+      appointment.source !== "history";
+
+    const appointmentData =
+      isClientBooking
+        ? {
+            ...appointment,
+
+            source: "booking" as const,
+
+            createdByUid:
+              currentUser.uid,
+
+            specialistNotificationSent:
+              false,
+          }
+        : appointment;
+
+    /*
+     * Сначала обязательно сохраняем запись.
+     */
+
+    const appointmentRef =
+      await addDoc(
+        collection(
+          db,
+          COLLECTION_NAME
+        ),
+        appointmentData
+      );
+
+    /*
+     * Исторические записи и записи,
+     * созданные специалистом, уведомление
+     * косметологу не отправляют.
+     */
+
+    if (
+      !isClientBooking ||
+      !currentUser ||
+      !clientRecord
+    ) {
+      return;
+    }
+
+    /*
+     * ============================================================
+     * SPECIALIST TELEGRAM NOTIFICATION
+     * ============================================================
+     */
+
+    try {
+      const idToken =
+        await getIdToken(
+          currentUser
+        );
+
+      const response =
+        await fetch(
+          "https://beauty-os-telegram.4ujaya1090.workers.dev/notify-specialist",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              Authorization:
+                `Bearer ${idToken}`,
+            },
+
+            body: JSON.stringify({
+              appointmentId:
+                appointmentRef.id,
+
+              clientName:
+                clientRecord.name,
+            }),
+          }
+        );
+
+      /*
+       * Теперь мы НЕ прячем HTTP-ошибки.
+       * Если Worker ответит 404/401/500,
+       * это будет видно в Console.
+       */
+
+      if (!response.ok) {
+        const errorText =
+          await response.text();
+
+        console.error(
+          "Specialist Telegram notification failed:",
+          response.status,
+          errorText
+        );
+
+        return;
+      }
+
+      console.log(
+        "Specialist Telegram notification request sent:",
+        appointmentRef.id
+      );
+    } catch (error) {
+      /*
+       * Ошибка Telegram не должна
+       * отменять уже созданную запись.
+       */
+
+      console.error(
+        "Specialist Telegram notification error:",
+        error
+      );
+    }
   }
+
+  /*
+   * ============================================================
+   * UPDATE APPOINTMENT
+   * ============================================================
+   */
 
   async function updateAppointment(
     updatedAppointment: Appointment
@@ -226,18 +411,38 @@ export function AppointmentProvider({
     } = updatedAppointment;
 
     await updateDoc(
-      doc(db, COLLECTION_NAME, id),
+      doc(
+        db,
+        COLLECTION_NAME,
+        id
+      ),
       rest
     );
   }
+
+  /*
+   * ============================================================
+   * DELETE APPOINTMENT
+   * ============================================================
+   */
 
   async function deleteAppointment(
     id: string
   ) {
     await deleteDoc(
-      doc(db, COLLECTION_NAME, id)
+      doc(
+        db,
+        COLLECTION_NAME,
+        id
+      )
     );
   }
+
+  /*
+   * ============================================================
+   * ADD PHOTO
+   * ============================================================
+   */
 
   async function addPhoto(
     appointmentId: string,
@@ -250,10 +455,17 @@ export function AppointmentProvider({
         appointmentId
       ),
       {
-        photos: arrayUnion(url),
+        photos:
+          arrayUnion(url),
       }
     );
   }
+
+  /*
+   * ============================================================
+   * REMOVE PHOTO
+   * ============================================================
+   */
 
   async function removePhoto(
     appointmentId: string,
@@ -266,10 +478,17 @@ export function AppointmentProvider({
         appointmentId
       ),
       {
-        photos: arrayRemove(url),
+        photos:
+          arrayRemove(url),
       }
     );
   }
+
+  /*
+   * ============================================================
+   * CONFLICT CHECK
+   * ============================================================
+   */
 
   function getConflict(
     candidate: {
@@ -280,7 +499,9 @@ export function AppointmentProvider({
     excludeId?: string
   ) {
     const candidateStart =
-      toMinutes(candidate.time);
+      toMinutes(
+        candidate.time
+      );
 
     const candidateEnd =
       candidateStart +
@@ -288,14 +509,21 @@ export function AppointmentProvider({
 
     return appointments.find(
       (appointment) => {
-        if (appointment.id === excludeId) {
+        if (
+          appointment.id ===
+          excludeId
+        ) {
           return false;
         }
 
-        // Исторические записи не участвуют
-        // в проверке пересечений расписания.
+        /*
+         * Исторические записи
+         * не занимают время.
+         */
+
         if (
-          appointment.source === "history"
+          appointment.source ===
+          "history"
         ) {
           return false;
         }
@@ -350,7 +578,9 @@ export function AppointmentProvider({
 
 export function useAppointments() {
   const context =
-    useContext(AppointmentContext);
+    useContext(
+      AppointmentContext
+    );
 
   if (!context) {
     throw new Error(

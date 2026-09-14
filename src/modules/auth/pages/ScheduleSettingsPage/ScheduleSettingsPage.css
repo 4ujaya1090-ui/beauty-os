@@ -62,3 +62,96 @@
     color:var(--color-text-light);
     font-size:14px;
 }
+/* =========================
+   Telegram
+   ========================= */
+
+.schedule-settings__telegram {
+  width: 100%;
+  min-height: 64px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 18px;
+  gap: 20px;
+
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.32);
+
+  box-shadow:
+    0 4px 16px rgba(90, 65, 45, 0.05);
+}
+
+.schedule-settings__telegram-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #5d5753;
+}
+
+.schedule-settings__telegram-button {
+  flex-shrink: 0;
+
+  min-width: 88px;
+  height: 38px;
+
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 11px;
+
+  background: #d2b9a5;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    opacity 0.2s ease;
+}
+
+.schedule-settings__telegram-button:hover {
+  background: #c6aa94;
+}
+
+.schedule-settings__telegram-button:active {
+  transform: scale(0.97);
+}
+
+.schedule-settings__telegram-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.schedule-settings__telegram-loading {
+  font-size: 13px;
+  color: #9b9189;
+}
+
+@media (max-width: 600px) {
+  .schedule-settings__telegram {
+    min-height: 58px;
+    padding: 10px 14px;
+    border-radius: 16px;
+  }
+
+  .schedule-settings__telegram-title {
+    font-size: 13px;
+  }
+
+  .schedule-settings__telegram-button {
+    min-width: 82px;
+    height: 36px;
+    padding: 0 14px;
+    font-size: 12px;
+  }
+}

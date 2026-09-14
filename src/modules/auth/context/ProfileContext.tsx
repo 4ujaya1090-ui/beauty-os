@@ -10,9 +10,6 @@ import {
   doc,
   onSnapshot,
   setDoc,
-  collection,
-  query,
-  limit,
 } from "firebase/firestore";
 
 import { db } from "../../../firebase/config";
@@ -35,13 +32,47 @@ export type WorkingHours = {
 };
 
 export const DEFAULT_WORKING_HOURS: WorkingHours = {
-  monday: { enabled: true, start: "09:00", end: "18:00" },
-  tuesday: { enabled: true, start: "09:00", end: "18:00" },
-  wednesday: { enabled: true, start: "09:00", end: "18:00" },
-  thursday: { enabled: true, start: "09:00", end: "18:00" },
-  friday: { enabled: true, start: "09:00", end: "18:00" },
-  saturday: { enabled: false, start: "", end: "" },
-  sunday: { enabled: false, start: "", end: "" },
+  monday: {
+    enabled: true,
+    start: "09:00",
+    end: "18:00",
+  },
+
+  tuesday: {
+    enabled: true,
+    start: "09:00",
+    end: "18:00",
+  },
+
+  wednesday: {
+    enabled: true,
+    start: "09:00",
+    end: "18:00",
+  },
+
+  thursday: {
+    enabled: true,
+    start: "09:00",
+    end: "18:00",
+  },
+
+  friday: {
+    enabled: true,
+    start: "09:00",
+    end: "18:00",
+  },
+
+  saturday: {
+    enabled: false,
+    start: "",
+    end: "",
+  },
+
+  sunday: {
+    enabled: false,
+    start: "",
+    end: "",
+  },
 };
 
 export type MedicalCardLabels = {
@@ -69,9 +100,10 @@ type ProfileContextType = {
   saveProfile: (profile: Profile) => Promise<void>;
 };
 
-const ProfileContext = createContext<ProfileContextType | undefined>(
-  undefined
-);
+const ProfileContext =
+  createContext<ProfileContextType | undefined>(
+    undefined
+  );
 
 type ProfileProviderProps = {
   children: ReactNode;
@@ -79,11 +111,20 @@ type ProfileProviderProps = {
 
 const COLLECTION_NAME = "profiles";
 
-export function ProfileProvider({ children }: ProfileProviderProps) {
+export function ProfileProvider({
+  children,
+}: ProfileProviderProps) {
   const { user } = useAuth();
 
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [
+    profile,
+    setProfile,
+  ] = useState<Profile | null>(null);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -94,63 +135,132 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
 
     setLoading(true);
 
-    const unsubscribe = onSnapshot(
-      doc(db, COLLECTION_NAME, user.uid),
-      (snap) => {
-        setProfile(snap.exists() ? (snap.data() as Profile) : null);
-        setLoading(false);
-      }
-    );
+    const unsubscribe =
+      onSnapshot(
+        doc(
+          db,
+          COLLECTION_NAME,
+          user.uid
+        ),
+        (snap) => {
+          setProfile(
+            snap.exists()
+              ? (snap.data() as Profile)
+              : null
+          );
+
+          setLoading(false);
+        }
+      );
 
     return unsubscribe;
   }, [user]);
 
-  async function saveProfile(newProfile: Profile) {
+  async function saveProfile(
+    newProfile: Profile
+  ) {
     if (!user) {
       return;
     }
 
-    await setDoc(doc(db, COLLECTION_NAME, user.uid), newProfile);
+    await setDoc(
+      doc(
+        db,
+        COLLECTION_NAME,
+        user.uid
+      ),
+      newProfile
+    );
   }
 
   return (
-    <ProfileContext.Provider value={{ profile, loading, saveProfile }}>
+    <ProfileContext.Provider
+      value={{
+        profile,
+        loading,
+        saveProfile,
+      }}
+    >
       {children}
     </ProfileContext.Provider>
   );
 }
 
 export function useProfile() {
-  const context = useContext(ProfileContext);
+  const context =
+    useContext(ProfileContext);
 
   if (!context) {
-    throw new Error("useProfile must be used inside ProfileProvider");
+    throw new Error(
+      "useProfile must be used inside ProfileProvider"
+    );
   }
 
   return context;
 }
 
-// Отдельный, независимый хук — для экранов клиента, которым нужно
-// прочитать профиль специалиста (а не свой собственный).
-// Специалист сейчас один, поэтому просто берём первый найденный профиль.
+
+/*
+ * ============================================================
+ * SPECIALIST PROFILE
+ * ============================================================
+ *
+ * Клиент должен получать профиль именно нашего специалиста,
+ * а не случайный первый документ из коллекции profiles.
+ *
+ * UID специалиста:
+ * AqyIZR3J1HUmhnD3jMMW8Y7RXRj2
+ *
+ * ============================================================
+ */
+
 export function useSpecialistProfile() {
-  const [specialistProfile, setSpecialistProfile] = useState<Profile | null>(
-    null
-  );
-  const [loading, setLoading] = useState(true);
+  const [
+    specialistProfile,
+    setSpecialistProfile,
+  ] = useState<Profile | null>(null);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
   useEffect(() => {
-    const specialistQuery = query(collection(db, COLLECTION_NAME), limit(1));
-
-    const unsubscribe = onSnapshot(specialistQuery, (snapshot) => {
-      setSpecialistProfile(
-        snapshot.empty ? null : (snapshot.docs[0].data() as Profile)
+    const specialistRef =
+      doc(
+        db,
+        COLLECTION_NAME,
+        "AqyIZR3J1HUmhnD3jMMW8Y7RXRj2"
       );
-      setLoading(false);
-    });
+
+    const unsubscribe =
+      onSnapshot(
+        specialistRef,
+        (snapshot) => {
+          setSpecialistProfile(
+            snapshot.exists()
+              ? (snapshot.data() as Profile)
+              : null
+          );
+
+          setLoading(false);
+        },
+        (error) => {
+          console.error(
+            "Не удалось загрузить профиль специалиста:",
+            error
+          );
+
+          setSpecialistProfile(null);
+          setLoading(false);
+        }
+      );
 
     return unsubscribe;
   }, []);
 
-  return { specialistProfile, loading };
+  return {
+    specialistProfile,
+    loading,
+  };
 }
